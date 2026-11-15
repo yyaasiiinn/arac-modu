@@ -15,7 +15,7 @@ class DivaAnnouncement extends StatefulWidget {
 
 class _DivaAnnouncementState extends State<DivaAnnouncement> with SingleTickerProviderStateMixin {
   late final AnimationController _anim =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 2800));
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 3200));
   String? _text;
   bool _welcome = true;
   Timer? _hide;
@@ -44,7 +44,7 @@ class _DivaAnnouncementState extends State<DivaAnnouncement> with SingleTickerPr
     });
     _anim.forward(from: 0);
     _hide?.cancel();
-    _hide = Timer(const Duration(milliseconds: 2800), () {
+    _hide = Timer(const Duration(milliseconds: 3200), () {
       if (mounted) setState(() => _text = null);
     });
   }
@@ -61,6 +61,20 @@ class _DivaAnnouncementState extends State<DivaAnnouncement> with SingleTickerPr
           // 0-0.15 içeri gir, 0.8-1 kaybol
           final opacity = t < 0.15 ? t / 0.15 : (t > 0.8 ? (1 - t) / 0.2 : 1.0);
           final scale = 0.7 + 0.3 * Curves.elasticOut.transform((t / 0.5).clamp(0.0, 1.0));
+          if (!_welcome) {
+            // Kapanış: "Keep going on" görseli, turuncu zemin üzerinde.
+            return Opacity(
+              opacity: opacity.clamp(0.0, 1.0),
+              child: Container(
+                color: const Color(0xFFDF672B),
+                alignment: Alignment.center,
+                child: Transform.scale(
+                  scale: scale,
+                  child: Image.asset('assets/keep_going.jpg', fit: BoxFit.contain),
+                ),
+              ),
+            );
+          }
           return Opacity(
             opacity: opacity.clamp(0.0, 1.0),
             child: Container(

@@ -145,7 +145,7 @@ class AppState extends ChangeNotifier {
       divaMode = on;
       CP.diva = on;
     });
-    announcement.value = on ? 'Hoş geldin divamız' : 'Keep going now';
+    announcement.value = on ? 'Hoş geldin divamız' : 'Keep going on';
     if (on) Tts.I.speak('Hoş geldin divamız!');
   }
 
