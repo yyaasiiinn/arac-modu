@@ -22,7 +22,7 @@ class NavAppInfo {
 }
 
 final navApps = <NavAppInfo>[
-  NavAppInfo('internal', 'Araç Modu', CupertinoIcons.location_north_fill, CP.blue, null, null),
+  NavAppInfo('internal', 'CarPlay', CupertinoIcons.location_north_fill, CP.blue, null, null),
   NavAppInfo('apple', 'Apple Haritalar', CupertinoIcons.map_fill, CP.green, 'maps://',
       (p) => 'maps://?daddr=${p.lat},${p.lon}&dirflg=d'),
   NavAppInfo('google', 'Google Maps', CupertinoIcons.map_pin_ellipse, const Color(0xFF34A853), 'comgooglemaps://',
@@ -56,7 +56,7 @@ Future<List<NavAppInfo>> installedNavApps() async {
 }
 
 /// Hedefe gitmeyi Ayarlar'daki tercihe göre başlatır:
-/// Araç Modu navigasyonu, seçilen uygulama ya da her seferinde sorarak.
+/// CarPlay navigasyonu, seçilen uygulama ya da her seferinde sorarak.
 Future<void> startNavigation(Place dest, {String? appId}) async {
   final id = appId ?? AppState.I.navApp;
   if (id == 'ask') {
@@ -80,7 +80,7 @@ Future<void> startNavigation(Place dest, {String? appId}) async {
   NavController.I.stop();
   final ok = await AppState.I.launchUrlString(app.url!(dest));
   if (!ok) {
-    AppState.I.toast('${app.name} açılamadı, Araç Modu ile devam ediliyor');
+    AppState.I.toast('${app.name} açılamadı, CarPlay ile devam ediliyor');
     await NavController.I.navigateTo(dest);
   }
 }

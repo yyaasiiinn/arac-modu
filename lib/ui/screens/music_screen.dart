@@ -94,7 +94,7 @@ class _MusicScreenState extends State<MusicScreen> {
                 child: Text(
                   m.authorized
                       ? 'Kitaplıkta çalma listesi yok.'
-                      : 'Müzik kitaplığına izin verilmedi. Ayarlar > Araç Modu > Medya ve Apple Music.',
+                      : 'Müzik kitaplığına izin verilmedi. Ayarlar > CarPlay > Medya ve Apple Music.',
                   style: TextStyle(color: p.subtext, fontSize: 16),
                 ),
               ),

@@ -179,7 +179,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
       return EmptyState(
         icon: CupertinoIcons.person_crop_circle_badge_xmark,
         title: 'Rehber izni yok',
-        message: 'Ayarlar > Araç Modu > Kişiler bölümünden izin verin.',
+        message: 'Ayarlar > CarPlay > Kişiler bölümünden izin verin.',
         action: 'Tekrar Dene',
         onAction: () => repo.load(force: true),
       );

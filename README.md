@@ -1,4 +1,4 @@
-# Araç Modu (CarPlay tarzı telefon uygulaması)
+# CarPlay (CarPlay tarzı telefon uygulaması)
 
 Ekranı olmayan araçlarda telefonu tutucuya takıp CarPlay gibi kullanmak için yazılmış Flutter uygulaması.
 Ses aracın hoparlörlerinden Bluetooth üzerinden gelir. Görüntü telefonun ekranında, CarPlay arayüzüne benzer bir düzende gösterilir.
@@ -9,7 +9,7 @@ Ses aracın hoparlörlerinden Bluetooth üzerinden gelir. Görüntü telefonun e
 |---|---|
 | Ana ekran + sol kenar çubuğu | Sayfalı simge ızgarası, saat/sinyal/pil, son 3 uygulama, ana ekran düğmesi (ana ekrandayken Dashboard'a geçer) |
 | Dashboard | Harita + Şu An Çalan + öneriler (takvim etkinliği, Ev/İş, favori kişiler) |
-| Haritalar | Adres/yer arama, kategoriler (akaryakıt, otopark, yemek…), rota önizleme, **adım adım sesli Türkçe navigasyon**, rotadan çıkınca yeniden hesaplama, gece haritası (Esri), yön yukarıda modu. Ayarlar'dan navigasyon uygulaması seçilebilir: Araç Modu, Apple Haritalar, Google Maps, Waze, Yandex (yalnızca yüklü olanlar) veya her seferinde sor |
+| Haritalar | Adres/yer arama, kategoriler (akaryakıt, otopark, yemek…), rota önizleme, **adım adım sesli Türkçe navigasyon**, rotadan çıkınca yeniden hesaplama, gece haritası (Esri), yön yukarıda modu. Ayarlar'dan navigasyon uygulaması seçilebilir: CarPlay, Apple Haritalar, Google Maps, Waze, Yandex (yalnızca yüklü olanlar) veya her seferinde sor |
 | Telefon | Favoriler, Son Aramalar, Kişiler (A-Z), Tuş Takımı |
 | Mesajlar | Kişi seç → sesle yazdır → sesli okut → uygulamanın içinde açılan pencereden SMS/iMessage gönder (veya WhatsApp), hazır yanıtlar, "varış saatim" paylaşımı |
 | Müzik / Şu An Çalan | Apple Music kontrolü (çal/duraklat/ileri/geri/sar, karışık, tekrar), çalma listeleri, kapak görseli |

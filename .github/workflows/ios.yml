@@ -34,19 +34,19 @@ jobs:
           flutter build ios --release --no-codesign -v > build.log 2>&1 || (grep -n -i -B2 -A8 "error" build.log | tail -c 50000 > build-tail.log; tail -c 20000 build.log >> build-tail.log; exit 1)
           mkdir -p build/Payload
           cp -R build/ios/iphoneos/Runner.app build/Payload/
-          cd build && zip -qr AracModu.ipa Payload
+          cd build && zip -qr CarPlay.ipa Payload
 
       - uses: actions/upload-artifact@v4
         with:
-          name: AracModu-ipa
-          path: build/AracModu.ipa
+          name: CarPlay-ipa
+          path: build/CarPlay.ipa
 
       - name: Release olarak yayınla
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          name: Araç Modu (derleme ${{ github.run_number }})
-          files: build/AracModu.ipa
+          name: CarPlay (derleme ${{ github.run_number }})
+          files: build/CarPlay.ipa
 
       - name: Hata günlüğünü yayınla
         if: failure()

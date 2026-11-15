@@ -207,8 +207,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _section('HAKKINDA'),
                 _group([
                   CarRow(
-                    leading: _icon(CupertinoIcons.info_circle_fill, CP.gray),
-                    title: 'Araç Modu 1.0',
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.asset('assets/app_icon.png', width: 34, height: 34),
+                    ),
+                    title: 'CarPlay 1.0',
                     subtitle: 'Harita: © OpenStreetMap katkıcıları · Rota: OSRM',
                   ),
                 ]),

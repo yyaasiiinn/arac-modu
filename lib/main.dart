@@ -68,7 +68,7 @@ class _CarModeAppState extends State<CarModeApp> with WidgetsBindingObserver {
     return ListenableBuilder(
       listenable: AppState.I,
       builder: (context, _) => MaterialApp(
-        title: 'Araç Modu',
+        title: 'CarPlay',
         debugShowCheckedModeBanner: false,
         scaffoldMessengerKey: AppState.messengerKey,
         navigatorKey: AppState.navigatorKey,

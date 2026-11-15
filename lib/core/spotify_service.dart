@@ -119,7 +119,7 @@ class SpotifyService extends ChangeNotifier {
         redirectUrl: redirectUrl,
         accessToken: _token,
         scope: _scope,
-        playerName: 'Araç Modu',
+        playerName: 'CarPlay',
       );
       if (connected) _subscribe();
     } on PlatformException catch (e) {

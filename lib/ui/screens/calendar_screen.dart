@@ -63,7 +63,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           body = EmptyState(
             icon: CupertinoIcons.calendar_badge_minus,
             title: 'Takvim izni yok',
-            message: 'Ayarlar > Araç Modu > Takvimler bölümünden tam erişim verin.',
+            message: 'Ayarlar > CarPlay > Takvimler bölümünden tam erişim verin.',
             action: 'Tekrar Dene',
             onAction: () => repo.load(force: true),
           );

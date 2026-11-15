@@ -1,6 +1,6 @@
 {
-    "name": "car_mode",
-    "short_name": "car_mode",
+    "name": "CarPlay",
+    "short_name": "CarPlay",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
