@@ -23,7 +23,8 @@ jobs:
 
       - name: IPA oluştur (imzasız)
         run: |
-          flutter build ios --release --no-codesign
+          set -o pipefail
+          flutter build ios --release --no-codesign -v 2>&1 | tee build.log | grep -v "^\[" || (tail -c 60000 build.log > build-tail.log; exit 1)
           mkdir -p build/Payload
           cp -R build/ios/iphoneos/Runner.app build/Payload/
           cd build && zip -qr AracModu.ipa Payload
@@ -39,3 +40,12 @@ jobs:
           tag_name: build-${{ github.run_number }}
           name: Araç Modu (derleme ${{ github.run_number }})
           files: build/AracModu.ipa
+
+      - name: Hata günlüğünü yayınla
+        if: failure()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: log-${{ github.run_number }}
+          name: Derleme günlüğü ${{ github.run_number }}
+          prerelease: true
+          files: build-tail.log
