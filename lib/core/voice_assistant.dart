@@ -13,6 +13,7 @@ import 'media_api.dart';
 import 'now_playing.dart';
 import 'models.dart';
 import 'music_service.dart';
+import 'nav_apps.dart';
 import 'nav_controller.dart';
 import 'routing_api.dart';
 import 'tts_service.dart';
@@ -238,15 +239,11 @@ class VoiceAssistant extends ChangeNotifier {
     if (RegExp(r'\b(git|gidelim|gotur|yol tarifi|navigasyon|rota olustur)\b').hasMatch(t)) {
       if (RegExp(r'\b(eve|evime|ev)\b').hasMatch(t)) {
         if (app.home == null) return _respond('Ev adresiniz kayıtlı değil. Ayarlar\'dan ekleyebilirsiniz.');
-        app.open(CarApp.maps);
-        await nav.navigateTo(app.home!);
-        return _respond(nav.active ? 'Eve gidiyoruz.' : (nav.error ?? 'Rota bulunamadı.'));
+        return _go(app.home!, 'Eve gidiyoruz.');
       }
       if (RegExp(r'\b(ise|isime|is yerine|ofise)\b').hasMatch(t)) {
         if (app.work == null) return _respond('İş adresiniz kayıtlı değil. Ayarlar\'dan ekleyebilirsiniz.');
-        app.open(CarApp.maps);
-        await nav.navigateTo(app.work!);
-        return _respond(nav.active ? 'İşe gidiyoruz.' : (nav.error ?? 'Rota bulunamadı.'));
+        return _go(app.work!, 'İşe gidiyoruz.');
       }
       var q = raw
           .replaceAll(RegExp(r'(yol tarifi( al| ver)?|navigasyon( başlat| baslat)?|götür|gotur|gidelim|git|rota( oluştur)?|beni|bana)', caseSensitive: false), ' ')
@@ -260,9 +257,7 @@ class VoiceAssistant extends ChangeNotifier {
       final query = q.replaceAll(RegExp(r'(en yakın|yakındaki|en yakin|yakindaki)', caseSensitive: false), '').trim();
       final res = await RoutingApi.search(query, near: LocationService.I.latLng, nearbyOnly: nearby);
       if (res.isEmpty) return _respond('"$query" bulunamadı.');
-      app.open(CarApp.maps);
-      await nav.navigateTo(res.first);
-      return _respond(nav.active ? '${res.first.name} için rota başladı.' : (nav.error ?? 'Rota bulunamadı.'));
+      return _go(res.first, '${res.first.name} için rota başladı.');
     }
 
     // --- Radyo ---
@@ -363,6 +358,12 @@ class VoiceAssistant extends ChangeNotifier {
       'ayarlar': CarApp.settings,
       'podcast': CarApp.podcasts,
       'radyo': CarApp.radio,
+      'spotify': CarApp.spotify,
+      'youtube': CarApp.youtubeMusic,
+      'whatsapp': CarApp.whatsapp,
+      'waze': CarApp.waze,
+      'google maps': CarApp.googleMaps,
+      'sesli kitap': CarApp.audiobooks,
       'ana ekran': CarApp.home,
       'dashboard': CarApp.dashboard,
     }.entries) {
@@ -376,6 +377,23 @@ class VoiceAssistant extends ChangeNotifier {
     if (any(['tesekkur', 'sagol'])) return _respond('Rica ederim.');
 
     return _respond('Bunu anlayamadım. "Annemi ara", "Eve git", "Kral FM aç" ya da "Müzik çal" diyebilirsiniz.');
+  }
+
+  /// Ayarlar'daki navigasyon uygulaması tercihine göre rotayı başlatır.
+  Future<void> _go(Place p, String okText) async {
+    final nav = NavController.I;
+    final appId = AppState.I.navApp;
+    if (appId == 'internal') {
+      AppState.I.open(CarApp.maps);
+      await nav.navigateTo(p);
+      return _respond(nav.active ? okText : (nav.error ?? 'Rota bulunamadı.'));
+    }
+    if (appId == 'ask') {
+      cancel();
+      return startNavigation(p);
+    }
+    await _respond('${navAppById(appId).name} açılıyor.');
+    await startNavigation(p);
   }
 
   FavContact? _findContact(String raw) {

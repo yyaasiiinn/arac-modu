@@ -14,6 +14,12 @@ enum CarApp {
   calendar,
   radio,
   podcasts,
+  spotify,
+  youtubeMusic,
+  audiobooks,
+  whatsapp,
+  waze,
+  googleMaps,
   settings,
 }
 
@@ -26,7 +32,6 @@ class AppInfo {
 
   /// Dolu ise uygulama içinde değil, dış uygulama olarak açılır.
   final String? url;
-  final String? fallbackUrl;
 
   const AppInfo(
     this.app,
@@ -35,7 +40,6 @@ class AppInfo {
     this.colors, {
     this.iconColor = Colors.white,
     this.url,
-    this.fallbackUrl,
   });
 
   bool get external => url != null;
@@ -59,6 +63,23 @@ const appInfos = <CarApp, AppInfo>{
       [Color(0xFFFF8A5B), Color(0xFFE8452C)]),
   CarApp.podcasts: AppInfo(CarApp.podcasts, 'Podcast\'ler',
       CupertinoIcons.dot_radiowaves_left_right, [Color(0xFFD56DFB), Color(0xFF872EC4)]),
+  CarApp.spotify: AppInfo(CarApp.spotify, 'Spotify', Icons.graphic_eq_rounded,
+      [Color(0xFF2A2A2A), Color(0xFF121212)],
+      iconColor: Color(0xFF1ED760), url: 'spotify://'),
+  CarApp.youtubeMusic: AppInfo(CarApp.youtubeMusic, 'YT Music',
+      CupertinoIcons.play_circle_fill, [Color(0xFFFF3B30), Color(0xFFC40000)],
+      url: 'youtubemusic://'),
+  CarApp.audiobooks: AppInfo(CarApp.audiobooks, 'Sesli Kitaplar',
+      CupertinoIcons.book_fill, [Color(0xFFFFB340), Color(0xFFFF7A00)],
+      url: 'ibooks://'),
+  CarApp.whatsapp: AppInfo(CarApp.whatsapp, 'WhatsApp',
+      CupertinoIcons.chat_bubble_text_fill, [Color(0xFF5BE584), Color(0xFF20B038)],
+      url: 'whatsapp://'),
+  CarApp.waze: AppInfo(CarApp.waze, 'Waze', CupertinoIcons.car_fill,
+      [Color(0xFF7CE0FF), Color(0xFF33CCFF)], url: 'waze://'),
+  CarApp.googleMaps: AppInfo(CarApp.googleMaps, 'Google Maps',
+      CupertinoIcons.map_pin_ellipse, [Color(0xFFFFFFFF), Color(0xFFEDEDED)],
+      iconColor: Color(0xFF34A853), url: 'comgooglemaps://'),
   CarApp.settings: AppInfo(CarApp.settings, 'Ayarlar',
       CupertinoIcons.gear_alt_fill, [Color(0xFFA2A2A8), Color(0xFF6E6E73)]),
 };
@@ -70,8 +91,14 @@ const homeOrder = <CarApp>[
   CarApp.maps,
   CarApp.messages,
   CarApp.nowPlaying,
+  CarApp.spotify,
+  CarApp.youtubeMusic,
   CarApp.radio,
   CarApp.podcasts,
   CarApp.calendar,
+  CarApp.whatsapp,
+  CarApp.audiobooks,
+  CarApp.waze,
+  CarApp.googleMaps,
   CarApp.settings,
 ];

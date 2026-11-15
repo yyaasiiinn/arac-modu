@@ -45,6 +45,8 @@ class CarShell extends StatelessWidget {
         return const RadioScreen();
       case CarApp.podcasts:
         return const PodcastScreen();
+      default:
+        return const HomeScreen();
     }
   }
 

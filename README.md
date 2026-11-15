@@ -9,7 +9,7 @@ Ses aracın hoparlörlerinden Bluetooth üzerinden gelir. Görüntü telefonun e
 |---|---|
 | Ana ekran + sol kenar çubuğu | Sayfalı simge ızgarası, saat/sinyal/pil, son 3 uygulama, ana ekran düğmesi (ana ekrandayken Dashboard'a geçer) |
 | Dashboard | Harita + Şu An Çalan + öneriler (takvim etkinliği, Ev/İş, favori kişiler) |
-| Haritalar | Adres/yer arama, kategoriler (akaryakıt, otopark, yemek…), rota önizleme, **adım adım sesli Türkçe navigasyon**, rotadan çıkınca yeniden hesaplama, gece haritası (Esri), yön yukarıda modu — tamamen uygulama içinde |
+| Haritalar | Adres/yer arama, kategoriler (akaryakıt, otopark, yemek…), rota önizleme, **adım adım sesli Türkçe navigasyon**, rotadan çıkınca yeniden hesaplama, gece haritası (Esri), yön yukarıda modu. Ayarlar'dan navigasyon uygulaması seçilebilir: Araç Modu, Apple Haritalar, Google Maps, Waze, Yandex (yalnızca yüklü olanlar) veya her seferinde sor |
 | Telefon | Favoriler, Son Aramalar, Kişiler (A-Z), Tuş Takımı |
 | Mesajlar | Kişi seç → sesle yazdır → sesli okut → uygulamanın içinde açılan pencereden SMS/iMessage gönder (veya WhatsApp), hazır yanıtlar, "varış saatim" paylaşımı |
 | Müzik / Şu An Çalan | Apple Music kontrolü (çal/duraklat/ileri/geri/sar, karışık, tekrar), çalma listeleri, kapak görseli |
@@ -18,6 +18,7 @@ Ses aracın hoparlörlerinden Bluetooth üzerinden gelir. Görüntü telefonun e
 | Ayarlar | Otomatik/Koyu/Açık tema, duvar kağıdı, ekranı açık tutma, yatay kilit, sesli yönlendirme, Ev/İş adresi |
 | Radyo | Türkiye'deki canlı radyolar (radio-browser.info), favoriler, sesle istasyon arama — uygulama içinde çalar |
 | Podcast'ler | Türkiye listesi, sesle arama, abonelik, kaldığın yerden devam — uygulama içinde çalar |
+| Spotify, YT Music, WhatsApp, Sesli Kitaplar, Waze, Google Maps | Doğrudan açılır (iOS ilk seferde bir kez "Açılsın mı?" diye sorar, sonra sormaz). Yüklü değilse uyarı verir |
 
 ## iPhone'a kurulum (ücretsiz yöntem)
 

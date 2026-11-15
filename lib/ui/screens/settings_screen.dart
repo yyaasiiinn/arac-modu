@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/app_state.dart';
 import '../../core/models.dart';
+import '../../core/nav_apps.dart';
 import '../../core/theme.dart';
 import '../widgets/common.dart';
 import '../widgets/place_search.dart';
@@ -98,6 +99,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ]),
                 _section('HARİTALAR'),
                 _group([
+                  CarRow(
+                    leading: _icon(navAppById(st.navApp == 'ask' ? 'internal' : st.navApp).icon,
+                        st.navApp == 'ask' ? CP.gray : navAppById(st.navApp).color),
+                    title: 'Navigasyon Uygulaması',
+                    subtitle: st.navApp == 'ask' ? 'Her seferinde sor' : navAppById(st.navApp).name,
+                    trailing: Icon(CupertinoIcons.chevron_right, color: p.subtext),
+                    onTap: () async {
+                      final a = await pickNavApp(context, title: 'Rotalar hangi uygulamada açılsın?', includeAsk: true);
+                      if (a != null) st.update(() => st.navApp = a.id);
+                    },
+                  ),
+                  const CarDivider(indent: 62),
                   _switch('Sesli Yönlendirme', CupertinoIcons.speaker_3_fill, CP.green, st.voiceGuidance,
                       (v) => st.update(() => st.voiceGuidance = v)),
                   const CarDivider(indent: 62),

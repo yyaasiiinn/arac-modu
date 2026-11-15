@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -30,6 +31,7 @@ class AppState extends ChangeNotifier {
   bool voiceGuidance = true;
   bool headingUp = true;
   bool startOnDashboard = false;
+  String navApp = 'internal'; // internal | apple | google | waze | yandex | ask
 
   // ---- Kayıtlı veriler ----
   Place? home;
@@ -48,6 +50,7 @@ class AppState extends ChangeNotifier {
     voiceGuidance = p.getBool('voiceGuidance') ?? true;
     headingUp = p.getBool('headingUp') ?? true;
     startOnDashboard = p.getBool('startOnDashboard') ?? false;
+    navApp = p.getString('navApp') ?? 'internal';
     home = _readPlace('home');
     work = _readPlace('work');
     recentPlaces = _readList('recentPlaces', Place.fromJson);
@@ -89,6 +92,7 @@ class AppState extends ChangeNotifier {
     p.setBool('voiceGuidance', voiceGuidance);
     p.setBool('headingUp', headingUp);
     p.setBool('startOnDashboard', startOnDashboard);
+    p.setString('navApp', navApp);
     if (home != null) {
       p.setString('home', jsonEncode(home!.toJson()));
     } else {
@@ -161,11 +165,26 @@ class AppState extends ChangeNotifier {
     open(current == CarApp.home ? CarApp.dashboard : CarApp.home);
   }
 
+  /// Diğer uygulamayı doğrudan açar (Safari'ye düşmez). Yüklü değilse uyarır.
+  /// Not: iOS, bir uygulamayı ilk kez açarken bir kez "Açılsın mı?" diye sorar;
+  /// "Aç" dendikten sonra bir daha sormaz.
   Future<void> openExternal(AppInfo info) async {
     HapticFeedback.selectionClick();
     final ok = await _launch(info.url!);
-    if (!ok && info.fallbackUrl != null) await _launch(info.fallbackUrl!);
+    if (!ok) toast('${info.name} bu telefonda yüklü değil');
   }
+
+  /// Uygulamanın her yerinden kısa bilgi mesajı göstermek için.
+  static final messengerKey = GlobalKey<ScaffoldMessengerState>();
+  static final navigatorKey = GlobalKey<NavigatorState>();
+
+  void toast(String text) {
+    messengerKey.currentState
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text), duration: const Duration(seconds: 2)));
+  }
+
+  Future<bool> launchUrlString(String url) => _launch(url);
 
   Future<bool> _launch(String url) async {
     try {

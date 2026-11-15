@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/app_state.dart';
 import '../../core/location_service.dart';
 import '../../core/models.dart';
+import '../../core/nav_apps.dart';
 import '../../core/nav_controller.dart';
 import '../../core/routing_api.dart';
 import '../../core/theme.dart';
@@ -248,9 +249,25 @@ class _PreviewCard extends StatelessWidget {
           Pressable(onTap: nav.stop, child: Icon(CupertinoIcons.xmark_circle_fill, color: p.subtext, size: 32)),
         ]),
         const SizedBox(height: 12),
-        Row(children: [
-          Expanded(child: PillButton(text: 'Git', color: CP.green, onTap: nav.start)),
-        ]),
+        Builder(builder: (context) {
+          final pref = AppState.I.navApp;
+          final label = pref == 'internal' || pref == 'ask' ? 'Git' : '${navAppById(pref).name} ile Git';
+          return Row(children: [
+            Expanded(child: PillButton(text: label, color: CP.green, onTap: () => startNavigation(d))),
+            const SizedBox(width: 10),
+            // Bu yolculuk için başka bir navigasyon uygulaması seç.
+            RoundButton(
+              icon: CupertinoIcons.square_arrow_up,
+              size: 54,
+              color: p.card2,
+              iconColor: p.text,
+              onTap: () async {
+                final a = await pickNavApp(context, title: 'Hangi uygulamayla gidelim?');
+                if (a != null) startNavigation(d, appId: a.id);
+              },
+            ),
+          ]);
+        }),
       ]),
     );
   }

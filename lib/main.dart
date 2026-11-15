@@ -68,6 +68,8 @@ class _CarModeAppState extends State<CarModeApp> with WidgetsBindingObserver {
       builder: (context, _) => MaterialApp(
         title: 'Araç Modu',
         debugShowCheckedModeBanner: false,
+        scaffoldMessengerKey: AppState.messengerKey,
+        navigatorKey: AppState.navigatorKey,
         theme: buildTheme(Brightness.light),
         darkTheme: buildTheme(Brightness.dark),
         themeMode: AppState.I.isDark ? ThemeMode.dark : ThemeMode.light,
