@@ -1,0 +1,31 @@
+name: iOS IPA (imzasız)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: IPA oluştur (imzasız)
+        run: |
+          flutter build ios --release --no-codesign
+          mkdir -p build/Payload
+          cp -R build/ios/iphoneos/Runner.app build/Payload/
+          cd build && zip -qr AracModu.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AracModu-ipa
+          path: build/AracModu.ipa
