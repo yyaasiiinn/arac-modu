@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'media_api.dart';
 import 'music_service.dart';
 import 'now_playing.dart';
+import 'spotify_service.dart';
 import 'web_players.dart';
 
 enum PlayerKind { none, radio, podcast }
@@ -179,6 +180,8 @@ class InAppPlayer extends ChangeNotifier {
   }) async {
     NowPlaying.preferInApp = true;
     NowPlaying.preferWeb = null;
+    NowPlaying.preferSpotify = false;
+    SpotifyService.I.pause();
     for (final w in WebPlayers.all) {
       w.pause();
     }

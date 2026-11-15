@@ -3,7 +3,9 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/app_state.dart';
 import '../../core/models.dart';
+import '../../core/apps.dart';
 import '../../core/nav_apps.dart';
+import '../../core/spotify_service.dart';
 import '../../core/theme.dart';
 import '../widgets/common.dart';
 import '../widgets/place_search.dart';
@@ -150,6 +152,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     titleColor: CP.red,
                     onTap: () => st.update(() => st.recentPlaces.clear()),
                   ),
+                ]),
+                _section('SPOTIFY'),
+                _group([
+                  CarRow(
+                    leading: _icon(Icons.graphic_eq_rounded, const Color(0xFF1DB954)),
+                    title: 'Spotify Bağlantısı',
+                    subtitle: !SpotifyService.I.configured
+                        ? 'Kurulmadı — dokunup kurun'
+                        : (SpotifyService.I.connected ? 'Bağlı' : 'Kurulu, bağlı değil'),
+                    trailing: Icon(CupertinoIcons.chevron_right, color: p.subtext),
+                    onTap: () => st.open(CarApp.spotify),
+                  ),
+                  if (SpotifyService.I.configured) ...[
+                    const CarDivider(indent: 62),
+                    CarRow(
+                      leading: _icon(CupertinoIcons.arrow_counterclockwise, CP.gray),
+                      title: 'Client ID\'yi Değiştir',
+                      titleColor: CP.red,
+                      onTap: () {
+                        SpotifyService.I.setClientId('');
+                        st.open(CarApp.spotify);
+                      },
+                    ),
+                  ],
                 ]),
                 _section('TELEFON'),
                 _group([

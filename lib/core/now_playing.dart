@@ -2,9 +2,10 @@ import 'package:flutter/foundation.dart';
 
 import 'in_app_player.dart';
 import 'music_service.dart';
+import 'spotify_service.dart';
 import 'web_players.dart';
 
-enum NowSource { apple, inApp, web }
+enum NowSource { apple, inApp, web, spotify }
 
 /// "Şu An Çalan" için tek kaynak: Apple Music, uygulamanın kendi oynatıcısı
 /// (radyo/podcast) ya da içerideki Spotify / YouTube Music — hangisi çalıyorsa
@@ -12,8 +13,9 @@ enum NowSource { apple, inApp, web }
 class NowPlaying {
   static bool preferInApp = false;
   static WebPlayer? preferWeb;
+  static bool preferSpotify = false;
 
-  static Listenable get listenable => Listenable.merge([MusicService.I, InAppPlayer.I, ...WebPlayers.all]);
+  static Listenable get listenable => Listenable.merge([MusicService.I, InAppPlayer.I, SpotifyService.I, ...WebPlayers.all]);
 
   static WebPlayer? get _playingWeb {
     for (final w in WebPlayers.all) {
@@ -24,8 +26,10 @@ class NowPlaying {
 
   static NowSource get source {
     if (InAppPlayer.I.isPlaying) return NowSource.inApp;
+    if (SpotifyService.I.isPlaying) return NowSource.spotify;
     if (_playingWeb != null) return NowSource.web;
     if (MusicService.I.isPlaying) return NowSource.apple;
+    if (preferSpotify && SpotifyService.I.hasItem) return NowSource.spotify;
     if (preferWeb != null && preferWeb!.opened && !preferInApp) return NowSource.web;
     if (preferInApp && InAppPlayer.I.active) return NowSource.inApp;
     return NowSource.apple;
@@ -37,21 +41,25 @@ class NowPlaying {
 
   static bool get hasItem => switch (source) {
         NowSource.inApp => InAppPlayer.I.active,
+        NowSource.spotify => SpotifyService.I.hasItem,
         NowSource.web => (web?.title ?? '').isNotEmpty,
         NowSource.apple => MusicService.I.hasItem,
       };
   static bool get isPlaying => switch (source) {
         NowSource.inApp => InAppPlayer.I.isPlaying,
+        NowSource.spotify => SpotifyService.I.isPlaying,
         NowSource.web => web?.isPlaying ?? false,
         NowSource.apple => MusicService.I.isPlaying,
       };
   static String get title => switch (source) {
         NowSource.inApp => InAppPlayer.I.title,
+        NowSource.spotify => SpotifyService.I.title,
         NowSource.web => web?.title ?? '',
         NowSource.apple => MusicService.I.title,
       };
   static String get subtitle => switch (source) {
         NowSource.inApp => InAppPlayer.I.subtitle,
+        NowSource.spotify => SpotifyService.I.artist,
         NowSource.web => [web?.artist ?? '', web?.name ?? ''].where((e) => e.isNotEmpty).join(' · '),
         NowSource.apple => MusicService.I.artist,
       };
@@ -65,6 +73,9 @@ class NowPlaying {
         return (ip.position.inMilliseconds / ip.duration.inMilliseconds).clamp(0.0, 1.0);
       case NowSource.web:
         return 0;
+      case NowSource.spotify:
+        final sp = SpotifyService.I;
+        return sp.durationMs > 0 ? (sp.livePositionMs / sp.durationMs).clamp(0.0, 1.0) : 0;
       case NowSource.apple:
         final m = MusicService.I;
         return m.duration > 0 ? (m.position / m.duration).clamp(0.0, 1.0) : 0;
@@ -73,22 +84,26 @@ class NowPlaying {
 
   static Future<void> playPause() => switch (source) {
         NowSource.inApp => InAppPlayer.I.playPause(),
+        NowSource.spotify => SpotifyService.I.playPause(),
         NowSource.web => web!.playPause(),
         NowSource.apple => MusicService.I.playPause(),
       };
   static Future<void> next() => switch (source) {
         NowSource.inApp => InAppPlayer.I.next(),
+        NowSource.spotify => SpotifyService.I.next(),
         NowSource.web => web!.next(),
         NowSource.apple => MusicService.I.next(),
       };
   static Future<void> previous() => switch (source) {
         NowSource.inApp => InAppPlayer.I.previous(),
+        NowSource.spotify => SpotifyService.I.previous(),
         NowSource.web => web!.previous(),
         NowSource.apple => MusicService.I.previous(),
       };
   static Future<void> pause() async {
     await InAppPlayer.I.pause();
     await MusicService.I.pause();
+    await SpotifyService.I.pause();
     for (final w in WebPlayers.all) {
       await w.pause();
     }

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'in_app_player.dart';
 import 'now_playing.dart';
+import 'spotify_service.dart';
 import 'web_players.dart';
 
 class Playlist {
@@ -81,6 +82,8 @@ class MusicService extends ChangeNotifier {
     if (const {'play', 'playAll', 'playPlaylist'}.contains(method)) {
       NowPlaying.preferInApp = false;
       NowPlaying.preferWeb = null;
+      NowPlaying.preferSpotify = false;
+      await SpotifyService.I.pause();
       await InAppPlayer.I.pause();
       for (final w in WebPlayers.all) {
         await w.pause();

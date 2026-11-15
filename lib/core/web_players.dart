@@ -11,6 +11,7 @@ import 'apps.dart';
 import 'in_app_player.dart';
 import 'music_service.dart';
 import 'now_playing.dart';
+import 'spotify_service.dart';
 
 /// Spotify ve YouTube Music'i başka uygulama açmadan, uygulamanın içinde
 /// (web oynatıcıları üzerinden) çalıştırır. Açılan oynatıcı arka planda
@@ -97,9 +98,23 @@ var art='';if(m&&m.artwork&&m.artwork.length){art=m.artwork[m.artwork.length-1].
 return JSON.stringify({t:m?(m.title||''):'',a:m?(m.artist||''):'',art:art,p:playing});
 }catch(e){return '{}';}})()''';
 
+  /// "Uygulamayı aç" / "Oturum aç" düğmelerini ve tanıtım bantlarını gizler.
+  static const _cleanJs = r'''
+(function(){try{
+var re=/^(open app|open in app|get the app|uygulamay[ıi] a[çc]|uygulamada a[çc]|uygulamay[ıi] edinin|sign in|oturum a[çc]|giri[şs] yap)$/i;
+document.querySelectorAll('a,button,tp-yt-paper-button,yt-button-renderer,ytmusic-guide-entry-renderer,tp-yt-paper-item').forEach(function(e){
+ var t=(e.innerText||e.getAttribute('aria-label')||'').trim();
+ if(re.test(t)){var el=e.closest('ytmusic-guide-entry-renderer,yt-button-renderer,tp-yt-paper-item')||e;el.style.display='none';}
+});
+document.querySelectorAll('ytmusic-mealbar-promo-renderer,ytmusic-statement-banner-renderer,ytmusic-popup-container tp-yt-paper-dialog,.upsell-dialog-renderer,ytmusic-upsell-dialog-renderer').forEach(function(e){e.style.display='none';});
+return 'ok';}catch(e){return 'err';}})()''';
+
   Future<void> refresh() async {
     final c = controller;
     if (c == null) return;
+    try {
+      await c.runJavaScriptReturningResult(_cleanJs);
+    } catch (_) {}
     try {
       var r = await c.runJavaScriptReturningResult(_metaJs);
       var s = r is String ? r : r.toString();
@@ -119,6 +134,8 @@ return JSON.stringify({t:m?(m.title||''):'',a:m?(m.artist||''):'',art:art,p:play
 
   void _onStartedPlaying() {
     NowPlaying.preferWeb = this;
+    NowPlaying.preferSpotify = false;
+    SpotifyService.I.pause();
     // Aynı anda iki şey çalmasın.
     if (InAppPlayer.I.isPlaying) InAppPlayer.I.pause();
     if (MusicService.I.isPlaying) MusicService.I.pause();
@@ -177,15 +194,6 @@ if(els.length){els[0].play();return 'play';}return 'none';})()''');
 }
 
 class WebPlayers {
-  static final spotify = WebPlayer(
-    CarApp.spotify,
-    'Spotify',
-    'https://open.spotify.com/',
-    playSel: ['[data-testid="control-button-playpause"]', 'button[aria-label="Play"]', 'button[aria-label="Pause"]', 'button[aria-label="Çal"]', 'button[aria-label="Duraklat"]'],
-    nextSel: ['[data-testid="control-button-skip-forward"]', 'button[aria-label="Next"]', 'button[aria-label="Sonraki"]'],
-    prevSel: ['[data-testid="control-button-skip-back"]', 'button[aria-label="Previous"]', 'button[aria-label="Önceki"]'],
-  );
-
   static final ytMusic = WebPlayer(
     CarApp.youtubeMusic,
     'YouTube Music',
@@ -195,7 +203,7 @@ class WebPlayers {
     prevSel: ['.previous-button', 'tp-yt-paper-icon-button.previous-button', 'button[aria-label="Previous"]', 'button[aria-label="Önceki"]', 'button[aria-label="Önceki şarkı"]'],
   );
 
-  static final all = [spotify, ytMusic];
+  static final all = [ytMusic];
 
   static WebPlayer? forApp(CarApp app) {
     for (final w in all) {

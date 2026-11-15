@@ -11,6 +11,7 @@ import 'core/in_app_player.dart';
 import 'core/location_service.dart';
 import 'core/music_service.dart';
 import 'core/nav_controller.dart';
+import 'core/spotify_service.dart';
 import 'core/theme.dart';
 import 'ui/shell.dart';
 
@@ -22,6 +23,7 @@ Future<void> main() async {
   await InAppPlayer.initBackground();
   await AppState.I.load();
   await InAppPlayer.I.load();
+  await SpotifyService.I.load();
   NavController.I; // konum dinleyicisini bağla
   runApp(const CarModeApp());
   // İzinleri sırayla iste (iOS aynı anda tek diyalog gösterir).

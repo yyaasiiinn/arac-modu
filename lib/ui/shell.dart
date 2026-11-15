@@ -15,6 +15,7 @@ import 'screens/phone_screen.dart';
 import 'screens/podcast_screen.dart';
 import 'screens/radio_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/spotify_screen.dart';
 import 'screens/web_app_screen.dart';
 import 'widgets/diva_announcement.dart';
 import 'widgets/sidebar.dart';
@@ -49,6 +50,7 @@ class CarShell extends StatelessWidget {
       case CarApp.podcasts:
         return const PodcastScreen();
       case CarApp.spotify:
+        return const SpotifyScreen();
       case CarApp.youtubeMusic:
         return WebAppScreen(app);
       default:

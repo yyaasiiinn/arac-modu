@@ -16,6 +16,7 @@ import 'music_service.dart';
 import 'nav_apps.dart';
 import 'nav_controller.dart';
 import 'routing_api.dart';
+import 'spotify_service.dart';
 import 'tts_service.dart';
 
 enum VoiceState { idle, listening, thinking, speaking }
@@ -260,6 +261,27 @@ class VoiceAssistant extends ChangeNotifier {
       return _go(res.first, '${res.first.name} için rota başladı.');
     }
 
+    // --- Spotify ---
+    if (RegExp(r'\bspotify\w*\b').hasMatch(t)) {
+      final sp = SpotifyService.I;
+      final q = raw
+          .replaceAll(RegExp(r"\b(spotify\w*|['’]?(da|de|dan|den|ta|te|tan|ten)|aç|ac|çal|cal|dinlet|dinle|oynat|lütfen)\b", caseSensitive: false), ' ')
+          .replaceAll(RegExp(r"['’]\w*"), ' ')
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim();
+      app.open(CarApp.spotify);
+      if (!sp.configured) return _respond('Spotify kurulumu için Client ID girmeniz gerekiyor.');
+      if (!await sp.connect()) return _respond(sp.error ?? 'Spotify\'a bağlanılamadı.');
+      if (q.length < 2) {
+        if (sp.isPaused) await sp.playPause();
+        return _respond('Spotify çalıyor.');
+      }
+      final res = await sp.search(q);
+      if (res.isEmpty) return _respond('"$q" bulunamadı.');
+      await sp.play(res.first.uri);
+      return _respond('${res.first.title} çalıyor.');
+    }
+
     // --- Radyo ---
     if (RegExp(r'\b(radyo\w*|fm)\b').hasMatch(t)) {
       final ip = InAppPlayer.I;
@@ -358,7 +380,6 @@ class VoiceAssistant extends ChangeNotifier {
       'ayarlar': CarApp.settings,
       'podcast': CarApp.podcasts,
       'radyo': CarApp.radio,
-      'spotify': CarApp.spotify,
       'youtube': CarApp.youtubeMusic,
       'whatsapp': CarApp.whatsapp,
       'waze': CarApp.waze,

@@ -6,6 +6,7 @@ import '../../core/apps.dart';
 import '../../core/in_app_player.dart';
 import '../../core/music_service.dart';
 import '../../core/now_playing.dart';
+import '../../core/spotify_service.dart';
 import '../../core/theme.dart';
 import '../widgets/common.dart';
 import '../widgets/now_playing_card.dart';
@@ -144,6 +145,8 @@ class NowPlayingView extends StatelessWidget {
         final src = NowPlaying.source;
         final inApp = src == NowSource.inApp;
         final isWeb = src == NowSource.web;
+        final isSp = src == NowSource.spotify;
+        final sp = SpotifyService.I;
         final m = MusicService.I;
         final ip = InAppPlayer.I;
         if (!NowPlaying.hasItem && !m.supported) {
@@ -156,8 +159,8 @@ class NowPlayingView extends StatelessWidget {
           );
         }
 
-        final double pos = isWeb ? 0 : (inApp ? ip.position.inMilliseconds / 1000 : m.position);
-        final double dur = isWeb ? 0 : (inApp ? ip.duration.inMilliseconds / 1000 : m.duration);
+        final double pos = isSp ? sp.livePositionMs / 1000 : isWeb ? 0 : (inApp ? ip.position.inMilliseconds / 1000 : m.position);
+        final double dur = isSp ? sp.durationMs / 1000 : isWeb ? 0 : (inApp ? ip.duration.inMilliseconds / 1000 : m.duration);
         final live = NowPlaying.isLive;
 
         return LayoutBuilder(builder: (context, c) {
@@ -165,14 +168,15 @@ class NowPlayingView extends StatelessWidget {
           final artSize = landscape ? (c.maxHeight - 40).clamp(100.0, 300.0) : (c.maxWidth * 0.6).clamp(100.0, 300.0);
 
           final controls = <Widget>[
-            if (!inApp && !isWeb) _btn(CupertinoIcons.shuffle, m.toggleShuffle, p, active: m.shuffle, size: 26),
+            if (isSp) _btn(CupertinoIcons.shuffle, sp.toggleShuffle, p, size: 26),
+            if (!inApp && !isWeb && !isSp) _btn(CupertinoIcons.shuffle, m.toggleShuffle, p, active: m.shuffle, size: 26),
             if (inApp && ip.kind == PlayerKind.radio)
               _btn(ip.isFavoriteStation(ip.station!) ? CupertinoIcons.star_fill : CupertinoIcons.star,
                   () => ip.toggleFavoriteStation(ip.station!), p, size: 28, color: CP.yellow),
             _btn(inApp && !live ? CupertinoIcons.gobackward_15 : CupertinoIcons.backward_fill, NowPlaying.previous, p, size: 40),
             _btn(NowPlaying.isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_fill, NowPlaying.playPause, p, size: 54),
             _btn(inApp && !live ? CupertinoIcons.goforward_30 : CupertinoIcons.forward_fill, NowPlaying.next, p, size: 40),
-            if (!inApp && !isWeb)
+            if (!inApp && !isWeb && !isSp)
               _btn(m.repeat == 2 ? CupertinoIcons.repeat_1 : CupertinoIcons.repeat, m.toggleRepeat, p,
                   active: m.repeat != 0, size: 26),
           ];
@@ -197,7 +201,7 @@ class NowPlayingView extends StatelessWidget {
                   ),
                 Flexible(
                   child: Text(
-                    isWeb
+                    isWeb || isSp
                         ? NowPlaying.subtitle
                         : inApp
                         ? (ip.error ?? (ip.loading ? 'Bağlanıyor…' : ip.subtitle))
@@ -221,7 +225,11 @@ class NowPlayingView extends StatelessWidget {
                   child: Slider(
                     value: pos.clamp(0, dur),
                     max: dur,
-                    onChanged: (v) => inApp ? ip.seek(Duration(milliseconds: (v * 1000).round())) : m.seek(v),
+                    onChanged: (v) => isSp
+                        ? sp.seek((v * 1000).round())
+                        : inApp
+                            ? ip.seek(Duration(milliseconds: (v * 1000).round()))
+                            : m.seek(v),
                   ),
                 ),
                 const SizedBox(height: 6),
