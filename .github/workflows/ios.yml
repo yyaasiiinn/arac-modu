@@ -21,6 +21,14 @@ jobs:
 
       - run: flutter pub get
 
+      - name: Spotify iOS SDK'yı hazırla
+        run: |
+          for d in ${PUB_CACHE:-$HOME/.pub-cache}/hosted/pub.dev/spotify_sdk_ios-*/ios; do
+            echo "SDK: $d"
+            (cd "$d" && sh ./prepare-iOS-SDK.sh)
+            ls "$d/spotify_sdk_ios/ios-sdk"
+          done
+
       - name: IPA oluştur (imzasız)
         run: |
           flutter build ios --release --no-codesign -v > build.log 2>&1 || (grep -n -i -B2 -A8 "error" build.log | tail -c 50000 > build-tail.log; tail -c 20000 build.log >> build-tail.log; exit 1)
