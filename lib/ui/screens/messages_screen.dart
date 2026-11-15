@@ -95,7 +95,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           actions: [
             Pressable(
               onTap: () => setState(() => _picking = true),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(8),
                 child: Icon(CupertinoIcons.square_pencil, color: CP.blue, size: 30),
               ),

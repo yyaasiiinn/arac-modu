@@ -72,7 +72,7 @@ class _MapsScreenState extends State<MapsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                     color: Palette.of(context).card.withValues(alpha: 0.96),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      const Icon(CupertinoIcons.search, color: CP.blue, size: 24),
+                      Icon(CupertinoIcons.search, color: CP.blue, size: 24),
                       const SizedBox(width: 10),
                       Text('Nereye?', style: TextStyle(color: Palette.of(context).text, fontSize: 20, fontWeight: FontWeight.w600)),
                     ]),
@@ -241,7 +241,7 @@ class _PreviewCard extends StatelessWidget {
                   style: TextStyle(color: p.text, fontSize: 21, fontWeight: FontWeight.w700)),
               const SizedBox(height: 2),
               Text('${formatDuration(r.duration)} · ${formatDistance(r.distance)}',
-                  style: const TextStyle(color: CP.green, fontSize: 18, fontWeight: FontWeight.w600)),
+                  style: TextStyle(color: CP.green, fontSize: 18, fontWeight: FontWeight.w600)),
               if (d.address.isNotEmpty)
                 Text(d.address, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: p.subtext, fontSize: 14)),
             ]),

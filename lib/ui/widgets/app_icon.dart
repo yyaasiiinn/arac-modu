@@ -14,6 +14,7 @@ class AppGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context); // Diva Modu değişince yeniden çiz
     Widget inner;
     if (info.app == CarApp.calendar) {
       final now = DateTime.now();
@@ -21,13 +22,17 @@ class AppGlyph extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(DateFormat('EEE', 'tr').format(now).toUpperCase(),
-              style: TextStyle(color: CP.red, fontSize: size * 0.15, fontWeight: FontWeight.w700, height: 1)),
+              style: TextStyle(color: CP.diva ? CP.hotPink : CP.red, fontSize: size * 0.15, fontWeight: FontWeight.w700, height: 1)),
           Text('${now.day}',
               style: TextStyle(color: Colors.black, fontSize: size * 0.46, fontWeight: FontWeight.w400, height: 1.05)),
         ],
       );
     } else {
-      inner = Icon(info.icon, color: info.iconColor, size: size * 0.52);
+      inner = Icon(info.icon, color: CP.diva ? Colors.white : info.iconColor, size: size * 0.52);
+    }
+    var colors = info.colors.length == 1 ? [info.colors[0], info.colors[0]] : info.colors;
+    if (CP.diva && info.app != CarApp.calendar) {
+      colors = divaIconGradients[info.app.index % divaIconGradients.length];
     }
     return Container(
       width: size,
@@ -37,9 +42,14 @@ class AppGlyph extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: info.colors.length == 1 ? [info.colors[0], info.colors[0]] : info.colors,
+          colors: colors,
         ),
-        boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 8, offset: Offset(0, 3))],
+        boxShadow: [
+          BoxShadow(
+              color: CP.diva ? const Color(0x66C2185B) : const Color(0x55000000),
+              blurRadius: 8,
+              offset: const Offset(0, 3)),
+        ],
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -85,7 +95,12 @@ class AppTile extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: labelColor, fontSize: 14, fontWeight: FontWeight.w500)),
+                style: TextStyle(
+                  color: labelColor,
+                  fontSize: 14,
+                  fontWeight: CP.diva ? FontWeight.w700 : FontWeight.w500,
+                  shadows: CP.diva ? const [Shadow(color: Color(0x88A0124F), blurRadius: 6)] : null,
+                )),
           ),
         ],
       ),

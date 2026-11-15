@@ -255,7 +255,7 @@ class _ContactListState extends State<_ContactList> {
                     onTap: () => _sc.jumpTo((letters[k]! * _rowH).clamp(0, _sc.position.maxScrollExtent)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 1),
-                      child: Text(k, style: const TextStyle(color: CP.blue, fontSize: 12, fontWeight: FontWeight.w600)),
+                      child: Text(k, style: TextStyle(color: CP.blue, fontSize: 12, fontWeight: FontWeight.w600)),
                     ),
                   ),
                 ),

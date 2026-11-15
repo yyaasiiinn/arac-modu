@@ -8,6 +8,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'apps.dart';
+import 'theme.dart';
+import 'tts_service.dart';
 import 'models.dart';
 
 enum ThemeChoice { auto, dark, light }
@@ -31,6 +33,7 @@ class AppState extends ChangeNotifier {
   bool voiceGuidance = true;
   bool headingUp = true;
   bool startOnDashboard = false;
+  bool divaMode = false;
   String navApp = 'internal'; // internal | apple | google | waze | yandex | ask
 
   // ---- Kayıtlı veriler ----
@@ -51,6 +54,8 @@ class AppState extends ChangeNotifier {
     headingUp = p.getBool('headingUp') ?? true;
     startOnDashboard = p.getBool('startOnDashboard') ?? false;
     navApp = p.getString('navApp') ?? 'internal';
+    divaMode = p.getBool('divaMode') ?? false;
+    CP.diva = divaMode;
     home = _readPlace('home');
     work = _readPlace('work');
     recentPlaces = _readList('recentPlaces', Place.fromJson);
@@ -93,6 +98,7 @@ class AppState extends ChangeNotifier {
     p.setBool('headingUp', headingUp);
     p.setBool('startOnDashboard', startOnDashboard);
     p.setString('navApp', navApp);
+    p.setBool('divaMode', divaMode);
     if (home != null) {
       p.setString('home', jsonEncode(home!.toJson()));
     } else {
@@ -127,6 +133,20 @@ class AppState extends ChangeNotifier {
             DeviceOrientation.landscapeRight,
           ]
         : const []);
+  }
+
+  /// Diva Modu açılış/kapanış yazısı (ekranda kısa süre görünür).
+  final announcement = ValueNotifier<String?>(null);
+
+  void setDivaMode(bool on) {
+    if (on == divaMode) return;
+    HapticFeedback.heavyImpact();
+    update(() {
+      divaMode = on;
+      CP.diva = on;
+    });
+    announcement.value = on ? 'Hoş geldin divamız' : 'Keep going now';
+    if (on) Tts.I.speak('Hoş geldin divamız!');
   }
 
   bool get isDark {

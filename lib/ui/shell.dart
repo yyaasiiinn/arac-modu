@@ -14,6 +14,7 @@ import 'screens/phone_screen.dart';
 import 'screens/podcast_screen.dart';
 import 'screens/radio_screen.dart';
 import 'screens/settings_screen.dart';
+import 'widgets/diva_announcement.dart';
 import 'widgets/sidebar.dart';
 import 'widgets/siri_overlay.dart';
 
@@ -57,7 +58,7 @@ class CarShell extends StatelessWidget {
       builder: (context, _) {
         final st = AppState.I;
         final p = Palette.of(context);
-        final colors = wallpapers[st.wallpaper.clamp(0, wallpapers.length - 1)];
+        final colors = st.divaMode ? divaWallpaper : wallpapers[st.wallpaper.clamp(0, wallpapers.length - 1)];
         final isHome = st.current == CarApp.home;
         return Scaffold(
           backgroundColor: p.bg,
@@ -98,6 +99,7 @@ class CarShell extends StatelessWidget {
             return Stack(children: [
               Positioned.fill(child: body),
               const Positioned.fill(child: SiriOverlay()),
+              const Positioned.fill(child: DivaAnnouncement()),
             ]);
           }),
         );

@@ -176,6 +176,8 @@ class _CarMapState extends State<CarMap> {
                 userAgentPackageName: 'com.yyaasiiinn.car_mode',
                 maxNativeZoom: 19,
                 maxZoom: 20,
+                // Diva Modu: haritayı pembe tonlara boya.
+                tileBuilder: p.diva ? _pinkTile : null,
               ),
             if (route != null)
               PolylineLayer(polylines: [
@@ -184,7 +186,7 @@ class _CarMapState extends State<CarMap> {
                   strokeWidth: 9,
                   color: _nav.active ? CP.blue : CP.blue.withValues(alpha: 0.85),
                   borderStrokeWidth: 3,
-                  borderColor: const Color(0xFF0A4FA8),
+                  borderColor: p.diva ? CP.deepPink : const Color(0xFF0A4FA8),
                 ),
               ]),
             MarkerLayer(markers: [
@@ -204,7 +206,7 @@ class _CarMapState extends State<CarMap> {
                   height: 40,
                   alignment: Alignment.topCenter,
                   rotate: true,
-                  child: const Icon(CupertinoIcons.map_pin, color: CP.orange, size: 40),
+                  child: Icon(CupertinoIcons.map_pin, color: CP.orange, size: 40),
                 ),
               if (pos != null)
                 Marker(
@@ -297,7 +299,7 @@ class _UserPuck extends StatelessWidget {
           ),
           padding: const EdgeInsets.all(4),
           child: Container(
-            decoration: const BoxDecoration(color: CP.blue, shape: BoxShape.circle),
+            decoration: BoxDecoration(color: CP.blue, shape: BoxShape.circle),
             child: const Icon(Icons.navigation_rounded, color: Colors.white, size: 26),
           ),
         ),
@@ -316,4 +318,18 @@ class _UserPuck extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Harita karosunu pembe tek renkli tona çevirir (açık yerler açık pembe, yollar/yazılar koyu pembe).
+Widget _pinkTile(BuildContext context, Widget tile, TileImage _) {
+  const r = 0.2126, g = 0.7152, b = 0.0722;
+  return ColorFiltered(
+    colorFilter: const ColorFilter.matrix([
+      r * 0.75, g * 0.75, b * 0.75, 0, 70, //
+      r * 0.62, g * 0.62, b * 0.62, 0, 25, //
+      r * 0.72, g * 0.72, b * 0.72, 0, 55, //
+      0, 0, 0, 1, 0,
+    ]),
+    child: tile,
+  );
 }

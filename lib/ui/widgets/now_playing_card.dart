@@ -25,7 +25,7 @@ class Artwork extends StatelessWidget {
         ? const [Color(0xFFFF8A5B), Color(0xFFE8452C)]
         : inApp
             ? const [Color(0xFFD56DFB), Color(0xFF872EC4)]
-            : const [Color(0xFFFF5C77), Color(0xFFFA233B)];
+            : (CP.diva ? const [Color(0xFFFF8CC6), Color(0xFFFF1493)] : const [Color(0xFFFF5C77), Color(0xFFFA233B)]);
     final icon = inApp && ip.kind == PlayerKind.radio
         ? CupertinoIcons.radiowaves_right
         : inApp

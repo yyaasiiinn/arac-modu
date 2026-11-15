@@ -92,7 +92,7 @@ class CarHeader extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: Row(children: [
-                  const Icon(CupertinoIcons.chevron_left, color: CP.blue, size: 26),
+                  Icon(CupertinoIcons.chevron_left, color: CP.blue, size: 26),
                   const SizedBox(width: 2),
                   Text('Geri', style: TextStyle(color: CP.blue, fontSize: 18, fontWeight: FontWeight.w500)),
                 ]),
@@ -257,12 +257,12 @@ class Avatar extends StatelessWidget {
 /// Büyük yuvarlak eylem butonu.
 class RoundButton extends StatelessWidget {
   final IconData icon;
-  final Color color;
+  final Color? color;
   final Color iconColor;
   final double size;
   final VoidCallback? onTap;
   final String? label;
-  const RoundButton({super.key, required this.icon, this.color = CP.blue, this.iconColor = Colors.white, this.size = 64, this.onTap, this.label});
+  const RoundButton({super.key, required this.icon, this.color, this.iconColor = Colors.white, this.size = 64, this.onTap, this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -271,7 +271,7 @@ class RoundButton extends StatelessWidget {
       child: Container(
         width: size,
         height: size,
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        decoration: BoxDecoration(color: color ?? CP.blue, shape: BoxShape.circle),
         child: Icon(icon, color: iconColor, size: size * 0.45),
       ),
     );
@@ -288,11 +288,11 @@ class RoundButton extends StatelessWidget {
 class PillButton extends StatelessWidget {
   final String text;
   final IconData? icon;
-  final Color color;
+  final Color? color;
   final Color textColor;
   final VoidCallback? onTap;
   final double height;
-  const PillButton({super.key, required this.text, this.icon, this.color = CP.blue, this.textColor = Colors.white, this.onTap, this.height = 54});
+  const PillButton({super.key, required this.text, this.icon, this.color, this.textColor = Colors.white, this.onTap, this.height = 54});
 
   @override
   Widget build(BuildContext context) {
@@ -302,7 +302,7 @@ class PillButton extends StatelessWidget {
       child: Container(
         height: height,
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(height / 2)),
+        decoration: BoxDecoration(color: color ?? CP.blue, borderRadius: BorderRadius.circular(height / 2)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,

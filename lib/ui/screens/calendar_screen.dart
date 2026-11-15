@@ -112,7 +112,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             CarHeader(title: 'Takvim', actions: [
               Pressable(
                 onTap: () => repo.load(force: true),
-                child: const Padding(padding: EdgeInsets.all(8), child: Icon(CupertinoIcons.refresh, color: CP.blue, size: 26)),
+                child: Padding(padding: EdgeInsets.all(8), child: Icon(CupertinoIcons.refresh, color: CP.blue, size: 26)),
               ),
             ]),
             Expanded(child: body),

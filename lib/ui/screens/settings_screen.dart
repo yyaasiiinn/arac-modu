@@ -53,6 +53,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const CarHeader(title: 'Ayarlar'),
             Expanded(
               child: ListView(padding: const EdgeInsets.only(bottom: 20), children: [
+                _section('STİL'),
+                _group([
+                  CarRow(
+                    leading: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [Color(0xFFFF8CC6), Color(0xFFFF1493)]),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text('💖', style: TextStyle(fontSize: 18)),
+                    ),
+                    title: 'Diva Modu',
+                    subtitle: st.divaMode ? 'Her şey pembe 💅' : 'Her şeyi pembe yap',
+                    onTap: () => st.setDivaMode(!st.divaMode),
+                    trailing: CupertinoSwitch(
+                      value: st.divaMode,
+                      onChanged: st.setDivaMode,
+                      activeTrackColor: CP.hotPink,
+                    ),
+                  ),
+                ]),
                 _section('GÖRÜNÜM'),
                 _group([
                   Padding(

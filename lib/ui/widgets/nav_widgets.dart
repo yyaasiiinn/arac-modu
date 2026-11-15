@@ -32,7 +32,7 @@ class ManeuverCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            color: const Color(0xFF1E7A3C),
+            color: CP.diva ? CP.hotPink : const Color(0xFF1E7A3C),
             padding: EdgeInsets.all(compact ? 10 : 14),
             child: Row(
               children: [
@@ -62,7 +62,7 @@ class ManeuverCard extends StatelessWidget {
           ),
           if (after != null && nav.distToManeuver < 1000 && !compact)
             Container(
-              color: const Color(0xFF155C2C),
+              color: CP.diva ? CP.deepPink : const Color(0xFF155C2C),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               child: Row(children: [
                 const Text('Sonra', style: TextStyle(color: Colors.white70, fontSize: 15)),

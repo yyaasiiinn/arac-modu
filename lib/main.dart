@@ -70,9 +70,13 @@ class _CarModeAppState extends State<CarModeApp> with WidgetsBindingObserver {
         debugShowCheckedModeBanner: false,
         scaffoldMessengerKey: AppState.messengerKey,
         navigatorKey: AppState.navigatorKey,
-        theme: buildTheme(Brightness.light),
-        darkTheme: buildTheme(Brightness.dark),
-        themeMode: AppState.I.isDark ? ThemeMode.dark : ThemeMode.light,
+        theme: buildTheme(Brightness.light, diva: AppState.I.divaMode),
+        darkTheme: AppState.I.divaMode
+            ? buildTheme(Brightness.light, diva: true)
+            : buildTheme(Brightness.dark),
+        themeMode: AppState.I.divaMode
+            ? ThemeMode.light
+            : (AppState.I.isDark ? ThemeMode.dark : ThemeMode.light),
         // Fareyle de kaydırılabilsin (web/test için).
         scrollBehavior: const MaterialScrollBehavior().copyWith(
           dragDevices: PointerDeviceKind.values.toSet(),

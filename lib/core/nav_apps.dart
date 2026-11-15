@@ -22,7 +22,7 @@ class NavAppInfo {
 }
 
 final navApps = <NavAppInfo>[
-  const NavAppInfo('internal', 'Araç Modu', CupertinoIcons.location_north_fill, CP.blue, null, null),
+  NavAppInfo('internal', 'Araç Modu', CupertinoIcons.location_north_fill, CP.blue, null, null),
   NavAppInfo('apple', 'Apple Haritalar', CupertinoIcons.map_fill, CP.green, 'maps://',
       (p) => 'maps://?daddr=${p.lat},${p.lon}&dirflg=d'),
   NavAppInfo('google', 'Google Maps', CupertinoIcons.map_pin_ellipse, const Color(0xFF34A853), 'comgooglemaps://',

@@ -168,7 +168,7 @@ class _RadioScreenState extends State<RadioScreen> {
                         child: Icon(CupertinoIcons.star_fill, color: CP.yellow, size: 18),
                       ),
                     if (current && ip.isPlaying)
-                      const Positioned(
+                      Positioned(
                         left: 2,
                         top: 2,
                         child: Icon(CupertinoIcons.speaker_3_fill, color: CP.blue, size: 18),

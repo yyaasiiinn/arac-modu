@@ -31,7 +31,7 @@ class _PlaceSearchPanelState extends State<PlaceSearchPanel> {
   String? _error;
   Timer? _debounce;
 
-  static const _categories = [
+  static List<(String, IconData, Color, String)> get _categories => [
     ('Akaryakıt', CupertinoIcons.drop_fill, CP.blue, 'akaryakıt istasyonu'),
     ('Otopark', CupertinoIcons.car_detailed, CP.indigo, 'otopark'),
     ('Yemek', Icons.restaurant_rounded, CP.orange, 'restoran'),
