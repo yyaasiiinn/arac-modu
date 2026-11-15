@@ -187,15 +187,30 @@ class AppState extends ChangeNotifier {
     await _launch('tel:$clean');
   }
 
-  Future<void> sendSms(String name, String number, String body) async {
+  static const _sms = MethodChannel('car_mode/sms');
+
+  /// SMS'i uygulamanın içinde açılan pencereyle gönderir.
+  /// Dönüş: 'sent', 'cancelled', 'failed' veya 'external' (Mesajlar uygulaması açıldı).
+  Future<String> sendSms(String name, String number, String body) async {
     final clean = number.replaceAll(RegExp(r'[^0-9+]'), '');
-    update(() {
-      recents.insert(0, CallLog(name, clean, DateTime.now(), CallKind.message));
-      if (recents.length > 50) recents.removeLast();
-    });
-    // iOS "sms:numara&body=", Android "sms:numara?body=" bekler.
-    final sep = defaultTargetPlatform == TargetPlatform.iOS ? '&' : '?';
-    await _launch('sms:$clean${sep}body=${Uri.encodeComponent(body)}');
+    String result = 'external';
+    try {
+      result = await _sms.invokeMethod<String>('send', {'to': clean, 'body': body}) ?? 'failed';
+    } catch (_) {
+      result = 'unavailable';
+    }
+    if (result == 'unavailable') {
+      final sep = defaultTargetPlatform == TargetPlatform.iOS ? '&' : '?';
+      await _launch('sms:$clean${sep}body=${Uri.encodeComponent(body)}');
+      result = 'external';
+    }
+    if (result == 'sent' || result == 'external') {
+      update(() {
+        recents.insert(0, CallLog(name, clean, DateTime.now(), CallKind.message));
+        if (recents.length > 50) recents.removeLast();
+      });
+    }
+    return result;
   }
 
   Future<void> sendWhatsApp(String number, String body) async {

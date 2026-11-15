@@ -28,18 +28,17 @@
 	<array>
 		<string>tel</string>
 		<string>sms</string>
-		<string>spotify</string>
-		<string>youtubemusic</string>
 		<string>whatsapp</string>
-		<string>waze</string>
-		<string>comgooglemaps</string>
-		<string>maps</string>
-		<string>podcasts</string>
-		<string>ibooks</string>
-		<string>music</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsForMedia</key>
+		<true/>
+	</dict>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Müzik uygulamasını kontrol etmek ve çalma listelerinizi göstermek için kullanılır.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>

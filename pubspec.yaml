@@ -50,6 +50,9 @@ dependencies:
   device_calendar: ^4.3.3
   intl: ^0.20.3
   cupertino_ui: ^1.1.6
+  just_audio: ^0.10.6
+  just_audio_background: ^0.0.1-beta.17
+  xml: ^7.1.0
 
 dev_dependencies:
   flutter_test:

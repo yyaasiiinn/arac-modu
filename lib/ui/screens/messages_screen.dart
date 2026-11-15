@@ -269,9 +269,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
             label: 'SMS',
             onTap: _body.isEmpty
                 ? null
-                : () {
-                    AppState.I.sendSms(to.name, to.number, _body);
-                    setState(() => _body = '');
+                : () async {
+                    final r = await AppState.I.sendSms(to.name, to.number, _body);
+                    if (!mounted) return;
+                    if (r == 'sent' || r == 'external') {
+                      setState(() => _body = '');
+                      if (r == 'sent') Tts.I.speak('Mesaj gönderildi.');
+                    } else if (r == 'failed') {
+                      Tts.I.speak('Mesaj gönderilemedi.');
+                    }
                   },
           ),
           RoundButton(

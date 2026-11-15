@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'in_app_player.dart';
+import 'now_playing.dart';
+
 class Playlist {
   final String id;
   final String name;
@@ -74,6 +77,10 @@ class MusicService extends ChangeNotifier {
   Future<void> _cmd(String method, [Object? arg]) async {
     if (!supported) return;
     HapticFeedback.lightImpact();
+    if (const {'play', 'playAll', 'playPlaylist'}.contains(method)) {
+      NowPlaying.preferInApp = false;
+      await InAppPlayer.I.pause();
+    }
     try {
       await _ch.invokeMethod(method, arg);
     } catch (_) {}

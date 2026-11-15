@@ -7,7 +7,10 @@ import 'app_state.dart';
 import 'apps.dart';
 import 'calendar_repo.dart';
 import 'contacts_repo.dart';
+import 'in_app_player.dart';
 import 'location_service.dart';
+import 'media_api.dart';
+import 'now_playing.dart';
 import 'models.dart';
 import 'music_service.dart';
 import 'nav_controller.dart';
@@ -262,6 +265,45 @@ class VoiceAssistant extends ChangeNotifier {
       return _respond(nav.active ? '${res.first.name} için rota başladı.' : (nav.error ?? 'Rota bulunamadı.'));
     }
 
+    // --- Radyo ---
+    if (RegExp(r'\b(radyo\w*|fm)\b').hasMatch(t)) {
+      final ip = InAppPlayer.I;
+      if (any(['kapat', 'durdur', 'sustur'])) {
+        await ip.pause();
+        return _respond('Radyo durduruldu.');
+      }
+      // "Kral FM aç", "Radyo Fenomen çal"
+      final name = raw
+          .replaceAll(RegExp(r"\b(radyoyu|radyosunu|radyo)\b|\b(aç|ac|çal|cal|açar mısın|dinle|dinlet|lütfen)\b|['’](yu|yi|u|i|ı|ü)\b", caseSensitive: false), ' ')
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim();
+      RadioStation? st;
+      if (name.length >= 2) {
+        final favs = ip.favoriteStations
+            .where((e) => ContactsRepo.norm(e.name).contains(ContactsRepo.norm(name)))
+            .toList();
+        if (favs.isNotEmpty) {
+          st = favs.first;
+        } else {
+          try {
+            final r = await MediaApi.searchRadio(name);
+            if (r.isNotEmpty) st = r.first;
+          } catch (_) {}
+        }
+      }
+      st ??= ip.station ?? (ip.favoriteStations.isNotEmpty ? ip.favoriteStations.first : null);
+      if (st == null) {
+        try {
+          final top = await MediaApi.topTurkishRadios();
+          if (top.isNotEmpty) st = top.first;
+        } catch (_) {}
+      }
+      if (st == null) return _respond('Radyo bulunamadı.');
+      await ip.playStation(st);
+      app.open(CarApp.nowPlaying);
+      return _respond('${st.name} çalıyor.');
+    }
+
     // --- Müzik ---
     if (any(['karisik', 'rastgele'])) {
       await music.shuffleAll();
@@ -269,25 +311,29 @@ class VoiceAssistant extends ChangeNotifier {
       return _respond('Kitaplığınız karışık çalınıyor.');
     }
     if (any(['sonraki', 'sarkiyi gec', 'atla', 'diger sarki'])) {
-      await music.next();
-      return _respond('Sonraki şarkı.');
+      await NowPlaying.next();
+      return _respond(NowPlaying.inApp ? 'Sonraki.' : 'Sonraki şarkı.');
     }
     if (any(['onceki', 'geri al', 'basa sar'])) {
-      await music.previous();
-      return _respond('Önceki şarkı.');
+      await NowPlaying.previous();
+      return _respond('Önceki.');
     }
     if (any(['durdur', 'duraklat', 'kapat', 'sustur']) && any(['muzik', 'sarki', 'durdur', 'duraklat'])) {
-      await music.pause();
+      await NowPlaying.pause();
       return _respond('Duraklatıldı.');
     }
     if (any(['muzik', 'sarki', 'cal', 'devam et', 'oynat'])) {
-      await music.play();
+      if (NowPlaying.inApp && InAppPlayer.I.active) {
+        if (!InAppPlayer.I.isPlaying) await InAppPlayer.I.playPause();
+      } else {
+        await music.play();
+      }
       app.open(CarApp.nowPlaying);
-      return _respond(music.supported ? 'Müzik çalıyor.' : 'Müzik kontrolü sadece iPhone\'da çalışır.');
+      return _respond('Çalıyor.');
     }
     if (any(['ne caliyor', 'bu sarki ne', 'hangi sarki'])) {
       await music.refresh();
-      return _respond(music.hasItem ? '${music.artist}, ${music.title}' : 'Şu anda bir şey çalmıyor.');
+      return _respond(NowPlaying.hasItem ? '${NowPlaying.subtitle}, ${NowPlaying.title}' : 'Şu anda bir şey çalmıyor.');
     }
 
     // --- Bilgi ---
@@ -315,10 +361,8 @@ class VoiceAssistant extends ChangeNotifier {
       'rehber': CarApp.phone,
       'mesajlar': CarApp.messages,
       'ayarlar': CarApp.settings,
-      'spotify': CarApp.spotify,
-      'whatsapp': CarApp.whatsapp,
-      'waze': CarApp.waze,
       'podcast': CarApp.podcasts,
+      'radyo': CarApp.radio,
       'ana ekran': CarApp.home,
       'dashboard': CarApp.dashboard,
     }.entries) {
@@ -331,7 +375,7 @@ class VoiceAssistant extends ChangeNotifier {
     if (any(['merhaba', 'selam'])) return _respond('Merhaba! Size nasıl yardımcı olabilirim?');
     if (any(['tesekkur', 'sagol'])) return _respond('Rica ederim.');
 
-    return _respond('Bunu anlayamadım. "Annemi ara", "Eve git" ya da "Müzik çal" diyebilirsiniz.');
+    return _respond('Bunu anlayamadım. "Annemi ara", "Eve git", "Kral FM aç" ya da "Müzik çal" diyebilirsiniz.');
   }
 
   FavContact? _findContact(String raw) {

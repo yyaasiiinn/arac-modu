@@ -1,7 +1,6 @@
 import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoIcons;
 import 'package:latlong2/latlong.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_state.dart';
 import '../../core/location_service.dart';
@@ -39,22 +38,6 @@ class _MapsScreenState extends State<MapsScreen> {
     if (NavController.I.mode != NavMode.idle) return;
     final p = await RoutingApi.reverse(ll);
     if (mounted) setState(() => _pinned = p);
-  }
-
-  Future<void> _openExternal(String which) async {
-    final d = NavController.I.destination;
-    if (d == null) return;
-    final ll = '${d.lat},${d.lon}';
-    final urls = {
-      'apple': ['maps://?daddr=$ll&dirflg=d', 'https://maps.apple.com/?daddr=$ll&dirflg=d'],
-      'google': ['comgooglemaps://?daddr=$ll&directionsmode=driving', 'https://www.google.com/maps/dir/?api=1&destination=$ll'],
-      'waze': ['waze://?ll=$ll&navigate=yes', 'https://waze.com/ul?ll=$ll&navigate=yes'],
-    }[which]!;
-    for (final u in urls) {
-      try {
-        if (await launchUrl(Uri.parse(u), mode: LaunchMode.externalApplication)) return;
-      } catch (_) {}
-    }
   }
 
   @override
@@ -147,7 +130,7 @@ class _MapsScreenState extends State<MapsScreen> {
                 left: 10,
                 bottom: 10,
                 width: panelW,
-                child: _PreviewCard(onExternal: _openExternal),
+                child: const _PreviewCard(),
               ),
 
             // --- Navigasyon ---
@@ -240,8 +223,7 @@ class _PlaceCard extends StatelessWidget {
 }
 
 class _PreviewCard extends StatelessWidget {
-  final void Function(String) onExternal;
-  const _PreviewCard({required this.onExternal});
+  const _PreviewCard();
 
   @override
   Widget build(BuildContext context) {
@@ -249,14 +231,6 @@ class _PreviewCard extends StatelessWidget {
     final nav = NavController.I;
     final r = nav.route!;
     final d = nav.destination!;
-    Widget ext(String label, String key) => Pressable(
-          onTap: () => onExternal(key),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(color: p.card2, borderRadius: BorderRadius.circular(12)),
-            child: Text(label, style: TextStyle(color: p.text, fontSize: 14, fontWeight: FontWeight.w500)),
-          ),
-        );
     return CarCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
         Row(children: [
@@ -276,12 +250,6 @@ class _PreviewCard extends StatelessWidget {
         const SizedBox(height: 12),
         Row(children: [
           Expanded(child: PillButton(text: 'Git', color: CP.green, onTap: nav.start)),
-        ]),
-        const SizedBox(height: 10),
-        Wrap(spacing: 8, runSpacing: 8, children: [
-          ext('Apple Haritalar', 'apple'),
-          ext('Google Maps', 'google'),
-          ext('Waze', 'waze'),
         ]),
       ]),
     );

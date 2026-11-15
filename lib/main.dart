@@ -7,6 +7,7 @@ import 'package:material_ui/material_ui.dart';
 import 'core/app_state.dart';
 import 'core/calendar_repo.dart';
 import 'core/contacts_repo.dart';
+import 'core/in_app_player.dart';
 import 'core/location_service.dart';
 import 'core/music_service.dart';
 import 'core/nav_controller.dart';
@@ -18,7 +19,9 @@ Future<void> main() async {
   Intl.defaultLocale = 'tr';
   await initializeDateFormatting('tr');
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  await InAppPlayer.initBackground();
   await AppState.I.load();
+  await InAppPlayer.I.load();
   NavController.I; // konum dinleyicisini bağla
   runApp(const CarModeApp());
   // İzinleri sırayla iste (iOS aynı anda tek diyalog gösterir).

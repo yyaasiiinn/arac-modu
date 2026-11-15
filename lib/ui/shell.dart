@@ -11,6 +11,8 @@ import 'screens/maps_screen.dart';
 import 'screens/messages_screen.dart';
 import 'screens/music_screen.dart';
 import 'screens/phone_screen.dart';
+import 'screens/podcast_screen.dart';
+import 'screens/radio_screen.dart';
 import 'screens/settings_screen.dart';
 import 'widgets/sidebar.dart';
 import 'widgets/siri_overlay.dart';
@@ -39,8 +41,10 @@ class CarShell extends StatelessWidget {
         return const CalendarScreen();
       case CarApp.settings:
         return const SettingsScreen();
-      default:
-        return const HomeScreen();
+      case CarApp.radio:
+        return const RadioScreen();
+      case CarApp.podcasts:
+        return const PodcastScreen();
     }
   }
 

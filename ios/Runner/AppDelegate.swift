@@ -1,10 +1,12 @@
 import Flutter
 import MediaPlayer
+import MessageUI
 import UIKit
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   private var musicBridge: MusicBridge?
+  private var smsBridge: SmsBridge?
 
   override func application(
     _ application: UIApplication,
@@ -17,6 +19,9 @@ import UIKit
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "MusicBridge") {
       musicBridge = MusicBridge(messenger: registrar.messenger())
+    }
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "SmsBridge") {
+      smsBridge = SmsBridge(messenger: registrar.messenger())
     }
   }
 }
@@ -123,5 +128,60 @@ class MusicBridge: NSObject {
       }
     }
     return d
+  }
+}
+
+/// SMS/iMessage'ı uygulamadan çıkmadan, uygulamanın içinde açılan pencereyle gönderir.
+class SmsBridge: NSObject, MFMessageComposeViewControllerDelegate {
+  private let channel: FlutterMethodChannel
+  private var pending: FlutterResult?
+
+  init(messenger: FlutterBinaryMessenger) {
+    channel = FlutterMethodChannel(name: "car_mode/sms", binaryMessenger: messenger)
+    super.init()
+    channel.setMethodCallHandler { [weak self] call, result in
+      self?.handle(call, result: result)
+    }
+  }
+
+  private func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard call.method == "send",
+      let args = call.arguments as? [String: Any],
+      let to = args["to"] as? String
+    else {
+      result(FlutterMethodNotImplemented)
+      return
+    }
+    guard MFMessageComposeViewController.canSendText(), let top = SmsBridge.topController() else {
+      result("unavailable")
+      return
+    }
+    let vc = MFMessageComposeViewController()
+    vc.recipients = [to]
+    vc.body = args["body"] as? String ?? ""
+    vc.messageComposeDelegate = self
+    pending?("cancelled")
+    pending = result
+    top.present(vc, animated: true)
+  }
+
+  func messageComposeViewController(
+    _ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult
+  ) {
+    controller.dismiss(animated: true)
+    var status = "failed"
+    if result == .sent { status = "sent" }
+    if result == .cancelled { status = "cancelled" }
+    pending?(status)
+    pending = nil
+  }
+
+  static func topController() -> UIViewController? {
+    let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+    let windows = scenes.flatMap { $0.windows }
+    let window = windows.first { $0.isKeyWindow } ?? windows.first
+    var top = window?.rootViewController
+    while let presented = top?.presentedViewController { top = presented }
+    return top
   }
 }

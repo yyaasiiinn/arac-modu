@@ -9,14 +9,15 @@ Ses aracın hoparlörlerinden Bluetooth üzerinden gelir. Görüntü telefonun e
 |---|---|
 | Ana ekran + sol kenar çubuğu | Sayfalı simge ızgarası, saat/sinyal/pil, son 3 uygulama, ana ekran düğmesi (ana ekrandayken Dashboard'a geçer) |
 | Dashboard | Harita + Şu An Çalan + öneriler (takvim etkinliği, Ev/İş, favori kişiler) |
-| Haritalar | Adres/yer arama, kategoriler (akaryakıt, otopark, yemek…), rota önizleme, **adım adım sesli Türkçe navigasyon**, rotadan çıkınca yeniden hesaplama, gece haritası, yön yukarıda modu, Apple/Google Maps/Waze'e aktarma |
+| Haritalar | Adres/yer arama, kategoriler (akaryakıt, otopark, yemek…), rota önizleme, **adım adım sesli Türkçe navigasyon**, rotadan çıkınca yeniden hesaplama, gece haritası (Esri), yön yukarıda modu — tamamen uygulama içinde |
 | Telefon | Favoriler, Son Aramalar, Kişiler (A-Z), Tuş Takımı |
-| Mesajlar | Kişi seç → sesle yazdır → sesli okut → SMS veya WhatsApp ile gönder, hazır yanıtlar, "varış saatim" paylaşımı |
+| Mesajlar | Kişi seç → sesle yazdır → sesli okut → uygulamanın içinde açılan pencereden SMS/iMessage gönder (veya WhatsApp), hazır yanıtlar, "varış saatim" paylaşımı |
 | Müzik / Şu An Çalan | Apple Music kontrolü (çal/duraklat/ileri/geri/sar, karışık, tekrar), çalma listeleri, kapak görseli |
 | Siri | Renkli küre ile Türkçe sesli asistan: "Annemi ara", "Ahmet'e mesaj gönder yoldayım", "Eve git", "En yakın benzinliğe git", "Müzik çal", "Sonraki şarkı", "Ne zaman varırım", "Saat kaç", "Takvimde ne var" |
 | Takvim | 7 günlük etkinlikler, konumlu etkinliğe tek dokunuşla rota |
 | Ayarlar | Otomatik/Koyu/Açık tema, duvar kağıdı, ekranı açık tutma, yatay kilit, sesli yönlendirme, Ev/İş adresi |
-| Podcast, Sesli Kitaplar, Spotify, YT Music, WhatsApp, Waze, Google Maps | Kısayol olarak ilgili uygulamayı açar |
+| Radyo | Türkiye'deki canlı radyolar (radio-browser.info), favoriler, sesle istasyon arama — uygulama içinde çalar |
+| Podcast'ler | Türkiye listesi, sesle arama, abonelik, kaldığın yerden devam — uygulama içinde çalar |
 
 ## iPhone'a kurulum (ücretsiz yöntem)
 
@@ -32,9 +33,9 @@ Ses aracın hoparlörlerinden Bluetooth üzerinden gelir. Görüntü telefonun e
 
 ## Bilmeniz gerekenler (iOS sınırları)
 
-- **SMS okunamaz:** iOS, uygulamaların gelen SMS'leri okumasına izin vermez. Gönderme işi Mesajlar/WhatsApp ekranı açılarak yapılır, son adımda "Gönder"e siz dokunursunuz.
+- **SMS okunamaz:** iOS, uygulamaların gelen SMS'leri okumasına izin vermez. Gönderirken uygulamanın içinde Apple'ın mesaj penceresi açılır; son "Gönder" dokunuşunu iOS zorunlu tutar.
 - **Arama onayı:** Arama başlatılırken iOS bir onay penceresi gösterir.
-- **Müzik kontrolü** sadece iPhone'un **Müzik (Apple Music)** uygulamasında çalışır. Spotify ve YouTube Music kendi uygulamalarında açılır. Bunları araçtaki direksiyon tuşları ve sesli komut da yönetebilir.
+- **Müzik kontrolü** iPhone'un **Müzik (Apple Music)** uygulamasıyla çalışır. Radyo ve podcast uygulamanın kendi oynatıcısında çalar.
 - **Son Aramalar** listesinde yalnızca bu uygulamadan yapılan aramalar görünür, çünkü iOS arama geçmişini paylaşmaz.
 - Harita verisi OpenStreetMap'ten, rotalar OSRM'den gelir. İkisi de ücretsizdir ve API anahtarı gerektirmez, ancak internet bağlantısı ister.
 

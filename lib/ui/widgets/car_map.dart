@@ -151,14 +151,32 @@ class _CarMapState extends State<CarMap> {
                   },
           ),
           children: [
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.yyaasiiinn.car_mode',
-              maxNativeZoom: 19,
-              maxZoom: 20,
-              // Gece modunda haritayı koyulaştır (CarPlay gece haritası gibi).
-              tileBuilder: p.dark ? darkModeTileBuilder : null,
-            ),
+            // Esri harita karoları (anahtarsız). Yüklenemezse OpenStreetMap'e düşer.
+            if (p.dark) ...[
+              TileLayer(
+                urlTemplate:
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+                fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.yyaasiiinn.car_mode',
+                maxNativeZoom: 16,
+                maxZoom: 20,
+              ),
+              TileLayer(
+                urlTemplate:
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+                userAgentPackageName: 'com.yyaasiiinn.car_mode',
+                maxNativeZoom: 16,
+                maxZoom: 20,
+              ),
+            ] else
+              TileLayer(
+                urlTemplate:
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+                fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.yyaasiiinn.car_mode',
+                maxNativeZoom: 19,
+                maxZoom: 20,
+              ),
             if (route != null)
               PolylineLayer(polylines: [
                 Polyline(
@@ -197,7 +215,7 @@ class _CarMapState extends State<CarMap> {
                 ),
             ]),
             SimpleAttributionWidget(
-              source: Text('OpenStreetMap', style: TextStyle(fontSize: 10, color: p.subtext)),
+              source: Text('Esri, OpenStreetMap', style: TextStyle(fontSize: 10, color: p.subtext)),
               alignment: Alignment.bottomRight,
               backgroundColor: p.card.withValues(alpha: 0.6),
             ),

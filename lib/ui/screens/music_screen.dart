@@ -3,9 +3,10 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/app_state.dart';
 import '../../core/apps.dart';
+import '../../core/in_app_player.dart';
 import '../../core/music_service.dart';
+import '../../core/now_playing.dart';
 import '../../core/theme.dart';
-import '../widgets/app_icon.dart';
 import '../widgets/common.dart';
 import '../widgets/now_playing_card.dart';
 
@@ -19,7 +20,7 @@ class MusicScreen extends StatefulWidget {
 }
 
 class _MusicScreenState extends State<MusicScreen> {
-  late int _tab = widget.startOnNowPlaying || MusicService.I.hasItem ? 0 : 1;
+  late int _tab = widget.startOnNowPlaying || NowPlaying.hasItem ? 0 : 1;
   Future<List<Playlist>>? _lists;
 
   @override
@@ -34,16 +35,20 @@ class _MusicScreenState extends State<MusicScreen> {
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
       child: Column(children: [
         CarSegments(
-          items: const ['Şu An Çalan', 'Kitaplık', 'Uygulamalar'],
+          items: const ['Şu An Çalan', 'Apple Music', 'Radyo', 'Podcast'],
           selected: _tab,
-          onChanged: (i) => setState(() => _tab = i),
+          onChanged: (i) {
+            if (i == 2) {
+              AppState.I.open(CarApp.radio);
+            } else if (i == 3) {
+              AppState.I.open(CarApp.podcasts);
+            } else {
+              setState(() => _tab = i);
+            }
+          },
         ),
         Expanded(
-          child: switch (_tab) {
-            0 => const NowPlayingView(),
-            1 => _library(),
-            _ => _apps(),
-          },
+          child: _tab == 0 ? const NowPlayingView() : _library(),
         ),
       ]),
     );
@@ -55,7 +60,7 @@ class _MusicScreenState extends State<MusicScreen> {
       return const EmptyState(
         icon: CupertinoIcons.music_note_list,
         title: 'Kitaplık sadece iPhone\'da',
-        message: 'Apple Music kitaplığınız iPhone uygulamasında görünür. Spotify için Uygulamalar sekmesini kullanın.',
+        message: 'Apple Music kitaplığınız iPhone uygulamasında görünür. Radyo ve Podcast sekmeleri her yerde çalışır.',
       );
     }
     final p = Palette.of(context);
@@ -116,28 +121,9 @@ class _MusicScreenState extends State<MusicScreen> {
     );
   }
 
-  Widget _apps() {
-    const apps = [CarApp.spotify, CarApp.youtubeMusic, CarApp.podcasts, CarApp.audiobooks];
-    return Center(
-      child: Wrap(
-        spacing: 30,
-        runSpacing: 20,
-        alignment: WrapAlignment.center,
-        children: [
-          for (final a in apps)
-            AppTile(
-              info: appInfos[a]!,
-              size: 80,
-              labelColor: Palette.of(context).text,
-              onTap: () => AppState.I.open(a),
-            ),
-        ],
-      ),
-    );
-  }
 }
 
-/// Büyük "Şu An Çalan" ekranı.
+/// Büyük "Şu An Çalan" ekranı (Apple Music, radyo veya podcast).
 class NowPlayingView extends StatelessWidget {
   const NowPlayingView({super.key});
 
@@ -145,6 +131,7 @@ class NowPlayingView extends StatelessWidget {
     if (s.isNaN || s < 0) s = 0;
     final m = s ~/ 60;
     final sec = (s % 60).floor();
+    if (m >= 60) return '${m ~/ 60}:${(m % 60).toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}';
     return '$m:${sec.toString().padLeft(2, '0')}';
   }
 
@@ -152,39 +139,73 @@ class NowPlayingView extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = Palette.of(context);
     return ListenableBuilder(
-      listenable: MusicService.I,
+      listenable: NowPlaying.listenable,
       builder: (context, _) {
+        final inApp = NowPlaying.inApp;
         final m = MusicService.I;
-        if (!m.supported) {
+        final ip = InAppPlayer.I;
+        if (!NowPlaying.hasItem && !m.supported) {
           return EmptyState(
             icon: CupertinoIcons.music_note_2,
-            title: 'Müzik kontrolü',
-            message: 'iPhone\'da Müzik uygulamasını buradan yönetebilirsiniz. Spotify/YouTube Music için uygulamayı açın; '
-                'sesli komut ve araçtaki tuşlar da çalışır.',
-            action: 'Spotify\'ı Aç',
-            onAction: () => AppState.I.open(CarApp.spotify),
+            title: 'Çalan bir şey yok',
+            message: 'Radyo veya podcast açabilir, iPhone\'da Apple Music kitaplığınızı çalabilirsiniz.',
+            action: 'Radyoyu Aç',
+            onAction: () => AppState.I.open(CarApp.radio),
           );
         }
+
+        final double pos = inApp ? ip.position.inMilliseconds / 1000 : m.position;
+        final double dur = inApp ? ip.duration.inMilliseconds / 1000 : m.duration;
+        final live = NowPlaying.isLive;
+
         return LayoutBuilder(builder: (context, c) {
           final landscape = c.maxWidth > c.maxHeight;
           final artSize = landscape ? (c.maxHeight - 40).clamp(100.0, 300.0) : (c.maxWidth * 0.6).clamp(100.0, 300.0);
+
+          final controls = <Widget>[
+            if (!inApp) _btn(CupertinoIcons.shuffle, m.toggleShuffle, p, active: m.shuffle, size: 26),
+            if (inApp && ip.kind == PlayerKind.radio)
+              _btn(ip.isFavoriteStation(ip.station!) ? CupertinoIcons.star_fill : CupertinoIcons.star,
+                  () => ip.toggleFavoriteStation(ip.station!), p, size: 28, color: CP.yellow),
+            _btn(inApp && !live ? CupertinoIcons.gobackward_15 : CupertinoIcons.backward_fill, NowPlaying.previous, p, size: 40),
+            _btn(NowPlaying.isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_fill, NowPlaying.playPause, p, size: 54),
+            _btn(inApp && !live ? CupertinoIcons.goforward_30 : CupertinoIcons.forward_fill, NowPlaying.next, p, size: 40),
+            if (!inApp)
+              _btn(m.repeat == 2 ? CupertinoIcons.repeat_1 : CupertinoIcons.repeat, m.toggleRepeat, p,
+                  active: m.repeat != 0, size: 26),
+          ];
 
           final info = Column(
             crossAxisAlignment: landscape ? CrossAxisAlignment.start : CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(m.hasItem ? m.title : 'Çalan bir şey yok',
+              Text(NowPlaying.hasItem ? NowPlaying.title : 'Çalan bir şey yok',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: landscape ? TextAlign.start : TextAlign.center,
                   style: TextStyle(color: p.text, fontSize: 28, fontWeight: FontWeight.w700)),
               const SizedBox(height: 4),
-              Text(m.hasItem ? [m.artist, m.album].where((e) => e.isNotEmpty).join(' — ') : 'Kitaplıktan bir liste seçin',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: p.subtext, fontSize: 19)),
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                if (live)
+                  Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    decoration: BoxDecoration(color: CP.red, borderRadius: BorderRadius.circular(6)),
+                    child: const Text('CANLI', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                  ),
+                Flexible(
+                  child: Text(
+                    inApp
+                        ? (ip.error ?? (ip.loading ? 'Bağlanıyor…' : ip.subtitle))
+                        : (m.hasItem ? [m.artist, m.album].where((e) => e.isNotEmpty).join(' — ') : 'Kitaplıktan bir liste seçin'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: inApp && ip.error != null ? CP.red : p.subtext, fontSize: 19),
+                  ),
+                ),
+              ]),
               const SizedBox(height: 18),
-              if (m.duration > 0) ...[
+              if (!live && dur > 0) ...[
                 SliderTheme(
                   data: SliderThemeData(
                     trackHeight: 5,
@@ -194,30 +215,20 @@ class NowPlayingView extends StatelessWidget {
                     inactiveTrackColor: p.card3,
                   ),
                   child: Slider(
-                    value: m.position.clamp(0, m.duration),
-                    max: m.duration,
-                    onChanged: (v) => m.seek(v),
+                    value: pos.clamp(0, dur),
+                    max: dur,
+                    onChanged: (v) => inApp ? ip.seek(Duration(milliseconds: (v * 1000).round())) : m.seek(v),
                   ),
                 ),
                 const SizedBox(height: 6),
                 Row(children: [
-                  Text(_t(m.position), style: TextStyle(color: p.subtext, fontSize: 14)),
+                  Text(_t(pos), style: TextStyle(color: p.subtext, fontSize: 14)),
                   const Spacer(),
-                  Text('-${_t(m.duration - m.position)}', style: TextStyle(color: p.subtext, fontSize: 14)),
+                  Text('-${_t(dur - pos)}', style: TextStyle(color: p.subtext, fontSize: 14)),
                 ]),
               ],
               const SizedBox(height: 14),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _btn(CupertinoIcons.shuffle, m.toggleShuffle, p, active: m.shuffle, size: 26),
-                  _btn(CupertinoIcons.backward_fill, m.previous, p, size: 40),
-                  _btn(m.isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_fill, m.playPause, p, size: 54),
-                  _btn(CupertinoIcons.forward_fill, m.next, p, size: 40),
-                  _btn(m.repeat == 2 ? CupertinoIcons.repeat_1 : CupertinoIcons.repeat, m.toggleRepeat, p,
-                      active: m.repeat != 0, size: 26),
-                ],
-              ),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: controls),
             ],
           );
 
@@ -240,13 +251,13 @@ class NowPlayingView extends StatelessWidget {
     );
   }
 
-  Widget _btn(IconData icon, VoidCallback onTap, Palette p, {bool active = false, double size = 32}) {
+  Widget _btn(IconData icon, VoidCallback onTap, Palette p, {bool active = false, double size = 32, Color? color}) {
     return Pressable(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: active ? BoxDecoration(color: p.card2, borderRadius: BorderRadius.circular(10)) : null,
-        child: Icon(icon, size: size, color: active ? CP.red : p.text),
+        child: Icon(icon, size: size, color: color ?? (active ? CP.red : p.text)),
       ),
     );
   }

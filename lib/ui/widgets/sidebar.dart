@@ -8,6 +8,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/app_state.dart';
 import '../../core/apps.dart';
+import '../../core/in_app_player.dart';
 import '../../core/music_service.dart';
 import '../../core/theme.dart';
 import '../../core/voice_assistant.dart';
@@ -110,7 +111,7 @@ class CarSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-        listenable: Listenable.merge([AppState.I, MusicService.I]),
+        listenable: Listenable.merge([AppState.I, MusicService.I, InAppPlayer.I]),
         builder: (context, _) => _build(context),
       );
 
@@ -215,7 +216,10 @@ class _RecentIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final info = appInfos[app]!;
-    final playing = app == CarApp.music && MusicService.I.isPlaying;
+    final ip = InAppPlayer.I;
+    final playing = (app == CarApp.music && MusicService.I.isPlaying) ||
+        (app == CarApp.radio && ip.isPlaying && ip.kind == PlayerKind.radio) ||
+        (app == CarApp.podcasts && ip.isPlaying && ip.kind == PlayerKind.podcast);
     return Pressable(
       onTap: () => AppState.I.open(app),
       child: Container(
