@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'in_app_player.dart';
 import 'now_playing.dart';
+import 'web_players.dart';
 
 class Playlist {
   final String id;
@@ -79,7 +80,11 @@ class MusicService extends ChangeNotifier {
     HapticFeedback.lightImpact();
     if (const {'play', 'playAll', 'playPlaylist'}.contains(method)) {
       NowPlaying.preferInApp = false;
+      NowPlaying.preferWeb = null;
       await InAppPlayer.I.pause();
+      for (final w in WebPlayers.all) {
+        await w.pause();
+      }
     }
     try {
       await _ch.invokeMethod(method, arg);

@@ -141,7 +141,9 @@ class NowPlayingView extends StatelessWidget {
     return ListenableBuilder(
       listenable: NowPlaying.listenable,
       builder: (context, _) {
-        final inApp = NowPlaying.inApp;
+        final src = NowPlaying.source;
+        final inApp = src == NowSource.inApp;
+        final isWeb = src == NowSource.web;
         final m = MusicService.I;
         final ip = InAppPlayer.I;
         if (!NowPlaying.hasItem && !m.supported) {
@@ -154,8 +156,8 @@ class NowPlayingView extends StatelessWidget {
           );
         }
 
-        final double pos = inApp ? ip.position.inMilliseconds / 1000 : m.position;
-        final double dur = inApp ? ip.duration.inMilliseconds / 1000 : m.duration;
+        final double pos = isWeb ? 0 : (inApp ? ip.position.inMilliseconds / 1000 : m.position);
+        final double dur = isWeb ? 0 : (inApp ? ip.duration.inMilliseconds / 1000 : m.duration);
         final live = NowPlaying.isLive;
 
         return LayoutBuilder(builder: (context, c) {
@@ -163,14 +165,14 @@ class NowPlayingView extends StatelessWidget {
           final artSize = landscape ? (c.maxHeight - 40).clamp(100.0, 300.0) : (c.maxWidth * 0.6).clamp(100.0, 300.0);
 
           final controls = <Widget>[
-            if (!inApp) _btn(CupertinoIcons.shuffle, m.toggleShuffle, p, active: m.shuffle, size: 26),
+            if (!inApp && !isWeb) _btn(CupertinoIcons.shuffle, m.toggleShuffle, p, active: m.shuffle, size: 26),
             if (inApp && ip.kind == PlayerKind.radio)
               _btn(ip.isFavoriteStation(ip.station!) ? CupertinoIcons.star_fill : CupertinoIcons.star,
                   () => ip.toggleFavoriteStation(ip.station!), p, size: 28, color: CP.yellow),
             _btn(inApp && !live ? CupertinoIcons.gobackward_15 : CupertinoIcons.backward_fill, NowPlaying.previous, p, size: 40),
             _btn(NowPlaying.isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_fill, NowPlaying.playPause, p, size: 54),
             _btn(inApp && !live ? CupertinoIcons.goforward_30 : CupertinoIcons.forward_fill, NowPlaying.next, p, size: 40),
-            if (!inApp)
+            if (!inApp && !isWeb)
               _btn(m.repeat == 2 ? CupertinoIcons.repeat_1 : CupertinoIcons.repeat, m.toggleRepeat, p,
                   active: m.repeat != 0, size: 26),
           ];
@@ -195,7 +197,9 @@ class NowPlayingView extends StatelessWidget {
                   ),
                 Flexible(
                   child: Text(
-                    inApp
+                    isWeb
+                        ? NowPlaying.subtitle
+                        : inApp
                         ? (ip.error ?? (ip.loading ? 'Bağlanıyor…' : ip.subtitle))
                         : (m.hasItem ? [m.artist, m.album].where((e) => e.isNotEmpty).join(' — ') : 'Kitaplıktan bir liste seçin'),
                     maxLines: 1,
@@ -229,6 +233,16 @@ class NowPlayingView extends StatelessWidget {
               ],
               const SizedBox(height: 14),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: controls),
+              if (isWeb && NowPlaying.web != null) ...[
+                const SizedBox(height: 12),
+                PillButton(
+                  text: '${NowPlaying.web!.name} oynatıcısını aç',
+                  height: 44,
+                  color: p.card2,
+                  textColor: p.text,
+                  onTap: () => AppState.I.open(NowPlaying.web!.app),
+                ),
+              ],
             ],
           );
 

@@ -53,6 +53,8 @@ dependencies:
   just_audio: ^0.10.6
   just_audio_background: ^0.0.1-beta.17
   xml: ^7.1.0
+  webview_flutter: ^4.14.1
+  webview_flutter_wkwebview: ^3.27.2
 
 dev_dependencies:
   flutter_test:

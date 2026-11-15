@@ -17,13 +17,18 @@ class Artwork extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final inApp = NowPlaying.inApp;
+    final src = NowPlaying.source;
+    final inApp = src == NowSource.inApp;
     final ip = InAppPlayer.I;
-    final bytes = inApp ? null : MusicService.I.artwork;
-    final url = inApp ? ip.artUrl : '';
+    final bytes = src == NowSource.apple ? MusicService.I.artwork : null;
+    final url = inApp ? ip.artUrl : (src == NowSource.web ? (NowPlaying.web?.artUrl ?? '') : '');
     final colors = inApp && ip.kind == PlayerKind.radio
         ? const [Color(0xFFFF8A5B), Color(0xFFE8452C)]
-        : inApp
+        : src == NowSource.web
+            ? (NowPlaying.web?.app == CarApp.spotify
+                ? const [Color(0xFF2A2A2A), Color(0xFF121212)]
+                : const [Color(0xFFFF3B30), Color(0xFFC40000)])
+            : inApp
             ? const [Color(0xFFD56DFB), Color(0xFF872EC4)]
             : (CP.diva ? const [Color(0xFFFF8CC6), Color(0xFFFF1493)] : const [Color(0xFFFF5C77), Color(0xFFFA233B)]);
     final icon = inApp && ip.kind == PlayerKind.radio
@@ -77,7 +82,9 @@ class NowPlayingCard extends StatelessWidget {
       builder: (context, _) {
         final has = NowPlaying.hasItem;
         return CarCard(
-          onTap: () => AppState.I.open(has ? CarApp.nowPlaying : CarApp.radio),
+          onTap: () => AppState.I.open(!has
+              ? CarApp.radio
+              : (NowPlaying.source == NowSource.web ? NowPlaying.web!.app : CarApp.nowPlaying)),
           padding: const EdgeInsets.all(14),
           child: LayoutBuilder(builder: (context, c) {
             final art = (c.maxHeight - 64).clamp(40.0, 90.0);

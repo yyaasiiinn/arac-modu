@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'media_api.dart';
 import 'music_service.dart';
 import 'now_playing.dart';
+import 'web_players.dart';
 
 enum PlayerKind { none, radio, podcast }
 
@@ -177,6 +178,10 @@ class InAppPlayer extends ChangeNotifier {
     Duration start = Duration.zero,
   }) async {
     NowPlaying.preferInApp = true;
+    NowPlaying.preferWeb = null;
+    for (final w in WebPlayers.all) {
+      w.pause();
+    }
     this.kind = kind;
     this.title = title;
     this.subtitle = subtitle;

@@ -4,6 +4,7 @@ import '../core/app_state.dart';
 import '../core/apps.dart';
 import '../core/music_service.dart';
 import '../core/theme.dart';
+import '../core/web_players.dart';
 import 'screens/calendar_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/home_screen.dart';
@@ -14,6 +15,7 @@ import 'screens/phone_screen.dart';
 import 'screens/podcast_screen.dart';
 import 'screens/radio_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/web_app_screen.dart';
 import 'widgets/diva_announcement.dart';
 import 'widgets/sidebar.dart';
 import 'widgets/siri_overlay.dart';
@@ -46,6 +48,9 @@ class CarShell extends StatelessWidget {
         return const RadioScreen();
       case CarApp.podcasts:
         return const PodcastScreen();
+      case CarApp.spotify:
+      case CarApp.youtubeMusic:
+        return WebAppScreen(app);
       default:
         return const HomeScreen();
     }
@@ -64,13 +69,16 @@ class CarShell extends StatelessWidget {
           backgroundColor: p.bg,
           body: LayoutBuilder(builder: (context, c) {
             final landscape = c.maxWidth >= c.maxHeight;
-            final content = Container(
-              decoration: BoxDecoration(
-                color: p.bg,
-                gradient: isHome
-                    ? LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: colors)
-                    : null,
-              ),
+            final isWeb = WebPlayers.forApp(st.current) != null;
+            final screen = Container(
+              decoration: isWeb
+                  ? null
+                  : BoxDecoration(
+                      color: p.bg,
+                      gradient: isHome
+                          ? LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: colors)
+                          : null,
+                    ),
               child: SafeArea(
                 left: !landscape,
                 right: true,
@@ -87,6 +95,17 @@ class CarShell extends StatelessWidget {
                 ),
               ),
             );
+            // Spotify / YouTube Music oynatıcıları alttaki katmanda hep canlı kalır.
+            final content = Stack(children: [
+              Positioned.fill(
+                child: SafeArea(
+                  left: !landscape,
+                  bottom: landscape,
+                  child: WebPlayersLayer(current: st.current),
+                ),
+              ),
+              Positioned.fill(child: screen),
+            ]);
             final body = landscape
                 ? Row(children: [
                     SafeArea(right: false, child: const CarSidebar()),
